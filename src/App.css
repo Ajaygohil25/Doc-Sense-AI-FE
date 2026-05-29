@@ -1,0 +1,214 @@
+/* App-specific CSS styles. Global styles are defined in index.css */
+
+/* ===== SHOW SIDEBAR BUTTON ===== */
+.show-sidebar-btn {
+  position: fixed;
+  left: 1rem;
+  top: 2rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-fast);
+}
+
+.show-sidebar-btn:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.show-sidebar-btn:active {
+  transform: translateY(0);
+}
+
+.show-sidebar-btn:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* ===== SIDEBAR BACKDROP (for overlay mode) ===== */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== MOBILE LAYOUT (< 768px) ===== */
+@media (max-width: 767px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .app-container.sidebar-hidden .show-sidebar-btn {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 50;
+  }
+
+  .main-content {
+    flex: 1;
+    width: 100%;
+    padding-left: 60px;
+  }
+
+  .app-container.sidebar-hidden .main-content {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .app-container.mobile .content-body {
+    padding: 1.25rem;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .app-container.mobile h1 {
+    font-size: 1.75rem;
+  }
+
+  .app-container.mobile h2 {
+    font-size: 1.25rem;
+  }
+
+  .app-container.mobile h3 {
+    font-size: 1rem;
+  }
+}
+
+/* ===== EXTRA SMALL DEVICES (< 375px) ===== */
+@media (max-width: 374px) {
+  .content-body {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .show-sidebar-btn {
+    width: 40px;
+    height: 40px;
+    left: 0.75rem;
+    top: 0.75rem;
+  }
+
+  .main-content {
+    padding-left: 52px;
+  }
+}
+
+/* ===== TABLET PORTRAIT (640px - 1023px) ===== */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .app-container {
+    flex-direction: row;
+  }
+
+  .show-sidebar-btn {
+    display: none;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 0;
+    width: 100%;
+  }
+
+  .app-container.sidebar-hidden .main-content {
+    width: 100%;
+  }
+
+  .app-container.sidebar-minimized .main-content {
+    padding: 0;
+  }
+
+  .content-body {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+}
+
+/* ===== LANDSCAPE ORIENTATION ===== */
+@media (orientation: landscape) and (max-width: 1024px) {
+  .content-body {
+    padding: 1rem 1.5rem;
+  }
+
+  .show-sidebar-btn {
+    top: 0.75rem;
+  }
+}
+
+/* ===== DESKTOP LAYOUT (1024px+) ===== */
+@media (min-width: 1024px) {
+  .app-container {
+    flex-direction: row;
+  }
+
+  .show-sidebar-btn {
+    position: fixed;
+    left: 1rem;
+    top: 2rem;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 0;
+  }
+
+  .content-body {
+    padding: 2rem;
+    max-width: 1200px;
+  }
+}
+
+/* ===== LARGE DESKTOP (1280px+) ===== */
+@media (min-width: 1280px) {
+  .content-body {
+    padding: 2.5rem;
+    max-width: 1400px;
+  }
+
+  .main-content {
+    overflow-x: auto;
+  }
+}
+
+/* ===== SAFE AREAS (Notched devices) ===== */
+@supports (padding: env(safe-area-inset-left)) {
+  .show-sidebar-btn {
+    left: calc(1rem + env(safe-area-inset-left));
+  }
+
+  .main-content {
+    padding-right: env(safe-area-inset-right);
+  }
+}
