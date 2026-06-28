@@ -2,6 +2,10 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { API_URL } from '../services/api';
 
+const buildRequestKey = (fileId, chatRoomId, messageId) => (
+  `${fileId}-${chatRoomId || 'default'}-${messageId}`
+);
+
 export const useSocket = () => {
   // Connection state
   const [isConnected, setIsConnected] = useState(false);
@@ -9,6 +13,9 @@ export const useSocket = () => {
   
   // Response state
   const [lastResponse, setLastResponse] = useState(null);
+  const [lastStreamEvent, setLastStreamEvent] = useState(null);
+  const [lastChatMessage, setLastChatMessage] = useState(null);
+  const [lastError, setLastError] = useState(null);
   const [socketError, setSocketError] = useState(null);
   
   // Loading state - NOW PROPERLY MANAGED
@@ -22,6 +29,45 @@ export const useSocket = () => {
   
   // NEW: Cleanup timeout ref for request timeout protection
   const cleanupIntervalRef = useRef(null);
+
+  const findPendingRequestKey = useCallback((data) => {
+    if (!data?.request_id) {
+      return null;
+    }
+
+    if (data.file_id) {
+      const directKey = buildRequestKey(data.file_id, data.chat_room_id, data.request_id);
+      if (pendingRequests.current.has(directKey)) {
+        return directKey;
+      }
+    }
+
+    for (const [requestKey, metadata] of pendingRequests.current) {
+      const sameFile = !data.file_id || String(metadata.fileId) === String(data.file_id);
+      const sameMessage = metadata.messageId === data.request_id;
+      const sameRoom = !data.chat_room_id || String(metadata.chatRoomId) === String(data.chat_room_id);
+
+      if (sameFile && sameMessage && sameRoom) {
+        return requestKey;
+      }
+    }
+
+    return null;
+  }, []);
+
+  const clearPendingRequest = useCallback((data) => {
+    const requestKey = findPendingRequestKey(data);
+
+    if (requestKey) {
+      pendingRequests.current.delete(requestKey);
+    }
+
+    if (pendingRequests.current.size === 0) {
+      setLoadingResponse(false);
+    }
+
+    return requestKey;
+  }, [findPendingRequestKey]);
 
   /**
    * Connects to Socket.IO server with JWT authentication
@@ -80,12 +126,53 @@ export const useSocket = () => {
 
     socket.on('connect_error', (err) => {
       console.error('Connection error:', err);
-      setSocketError('Authentication or connection failed.');
+      setSocketError(err?.message || 'Authentication or connection failed.');
       setIsConnected(false);
       setLoadingResponse(false); // NEW: Clear loading on connection error
     });
 
     // ========== QUESTION/RESPONSE EVENTS ==========
+
+    socket.on('chat_message_created', (data) => {
+      if (!data || !data.chat_room_id || !data.message || !data.sender) {
+        console.error('Invalid chat message format received:', data);
+        setSocketError('Received malformed chat message from server');
+        return;
+      }
+
+      setLastChatMessage({
+        ...data,
+        received_at: Date.now()
+      });
+      setSocketError(null);
+    });
+
+    socket.on('question_response_start', (data) => {
+      setLastStreamEvent({
+        ...data,
+        type: 'start',
+        received_at: Date.now()
+      });
+      setSocketError(null);
+    });
+
+    socket.on('question_response_chunk', (data) => {
+      setLastStreamEvent({
+        ...data,
+        type: 'chunk',
+        received_at: Date.now()
+      });
+      setSocketError(null);
+    });
+
+    socket.on('question_response_end', (data) => {
+      setLastStreamEvent({
+        ...data,
+        type: 'end',
+        received_at: Date.now()
+      });
+      setSocketError(null);
+    });
 
     socket.on('question_response', (data) => {
       console.log('Received response from server:', data);
@@ -98,16 +185,10 @@ export const useSocket = () => {
         return;
       }
 
-      const requestId = data.request_id ? `${data.file_id}-${data.request_id}` : null;
-      const isOwnPendingRequest = requestId && pendingRequests.current.has(requestId);
+      const requestKey = clearPendingRequest(data);
+      const isOwnPendingRequest = Boolean(requestKey);
 
-      if (isOwnPendingRequest) {
-        pendingRequests.current.delete(requestId);
-
-        if (pendingRequests.current.size === 0) {
-          setLoadingResponse(false);
-        }
-      } else {
+      if (!isOwnPendingRequest) {
         console.log(
           'Received broadcast response from another tab/session:',
           data
@@ -129,6 +210,12 @@ export const useSocket = () => {
       console.error('Socket.IO server error:', data);
       const errorMsg = data?.message || 'An error occurred on the server.';
       setSocketError(errorMsg);
+      setLastError({
+        ...data,
+        message: errorMsg,
+        received_at: Date.now()
+      });
+      clearPendingRequest(data);
       
       // NEW: Critical fix - clear loading state on error
       setLoadingResponse(false);
@@ -145,7 +232,7 @@ export const useSocket = () => {
     });
 
     socketRef.current = socket;
-  }, []);
+  }, [clearPendingRequest]);
 
   /**
    * Disconnects socket
@@ -242,19 +329,21 @@ export const useSocket = () => {
    * NEW: Enhanced askQuestion with request tracking and message ID
    * 
    * @param {string} fileId - The file ID to ask about
+   * @param {string} chatRoomId - The chat room ID to store this question in
    * @param {string} question - The question text
    * @param {string} messageId - Unique message ID for tracking
    * @returns {boolean} - true if emitted successfully, false otherwise
    */
-  const askQuestion = useCallback((fileId, question, messageId) => {
+  const askQuestion = useCallback((fileId, chatRoomId, question, messageId) => {
     if (!socketRef.current || !isConnected) {
       console.warn('Socket not connected. Cannot emit ask_question.');
       return false;
     }
 
-    if (!fileId || !question || !messageId) {
+    if (!fileId || !chatRoomId || !question || !messageId) {
       console.error('Missing required parameters for askQuestion', {
         fileId,
+        chatRoomId,
         question,
         messageId
       });
@@ -263,9 +352,10 @@ export const useSocket = () => {
 
     try {
       // NEW: Start tracking this request
-      const requestId = `${fileId}-${messageId}`;
+      const requestId = buildRequestKey(fileId, chatRoomId, messageId);
       pendingRequests.current.set(requestId, {
         fileId,
+        chatRoomId,
         messageId,
         question,
         timestamp: Date.now(),
@@ -282,6 +372,7 @@ export const useSocket = () => {
       // NEW: Include request_id for backend response matching
       socketRef.current.emit('ask_question', {
         file_id: fileId,
+        chat_room_id: chatRoomId,
         question: question,
         request_id: messageId
       });
@@ -289,7 +380,7 @@ export const useSocket = () => {
       return true;
     } catch (err) {
       console.error('Error emitting ask_question:', err);
-      pendingRequests.current.delete(`${fileId}-${messageId}`);
+      pendingRequests.current.delete(buildRequestKey(fileId, chatRoomId, messageId));
       setLoadingResponse(false);
       return false;
     }
@@ -298,8 +389,8 @@ export const useSocket = () => {
   /**
    * NEW: Check if there's a pending request for given file and message
    */
-  const hasPendingRequest = useCallback((fileId, messageId) => {
-    return pendingRequests.current.has(`${fileId}-${messageId}`);
+  const hasPendingRequest = useCallback((fileId, chatRoomId, messageId) => {
+    return pendingRequests.current.has(buildRequestKey(fileId, chatRoomId, messageId));
   }, []);
 
   /**
@@ -316,6 +407,9 @@ export const useSocket = () => {
     
     // Response state
     lastResponse,
+    lastStreamEvent,
+    lastChatMessage,
+    lastError,
     socketError,
     loadingResponse,
     
