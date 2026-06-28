@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   ArrowLeft,
   Clock,
-  FileText,
   MessageSquare,
   Plus,
   Send,
@@ -85,6 +84,7 @@ const DocumentChat = () => {
     isConnected,
     lastResponse,
     lastStreamEvent,
+    lastChatMessage,
     lastError,
     socketError,
     loadingResponse,
@@ -201,6 +201,45 @@ const DocumentChat = () => {
       ];
     });
   }, [selectedRoomId]);
+
+  const upsertChatMessage = useCallback((event) => {
+    const incomingMessage = {
+      id: event.id || `${event.sender}-${event.received_at}`,
+      roomId: event.room_id || event.chat_room_id,
+      sender: event.sender,
+      text: event.message,
+      timestamp: event.created_at || new Date(),
+      requestId: event.request_id
+    };
+
+    setMessages((prev) => {
+      let found = false;
+      const nextMessages = prev.map((message) => {
+        const sameId = incomingMessage.id && message.id === incomingMessage.id;
+        const samePendingMessage = incomingMessage.requestId
+          && message.requestId === incomingMessage.requestId
+          && message.sender === incomingMessage.sender;
+
+        if (!sameId && !samePendingMessage) return message;
+
+        found = true;
+        return {
+          ...message,
+          ...incomingMessage
+        };
+      });
+
+      if (found) return nextMessages;
+
+      return [...nextMessages, incomingMessage];
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isCurrentSocketEvent(lastChatMessage)) return;
+
+    upsertChatMessage(lastChatMessage);
+  }, [isCurrentSocketEvent, lastChatMessage, upsertChatMessage]);
 
   useEffect(() => {
     if (!isCurrentSocketEvent(lastStreamEvent) || !lastStreamEvent.request_id) return;
@@ -398,7 +437,8 @@ const DocumentChat = () => {
         roomId,
         sender: 'user',
         text: question,
-        timestamp: new Date()
+        timestamp: new Date(),
+        requestId: messageId
       },
       {
         id: responseId,
@@ -468,41 +508,19 @@ const DocumentChat = () => {
 
   return (
     <div className="document-chat-page">
-      <header className="chat-header">
-        <Link to="/documents" className="icon-button" title="Back to documents" aria-label="Back to documents">
-          <ArrowLeft size={18} />
-        </Link>
-
-        <div className="chat-title-info">
-          <FileText size={20} className="file-icon" />
-          <div className="title-details">
-            <h2 title={fileDetails.file_name}>{fileDetails.file_name}</h2>
-            <div className="meta-row">
-              <span className="status-chip">{fileDetails.status}</span>
-              {isConnected ? (
-                <span className="connection-pill online" title={`Connected - ${pendingCount} pending`}>
-                  <Wifi size={12} />
-                  <span>Realtime</span>
-                </span>
-              ) : (
-                <span className="connection-pill offline" title="REST fallback will be used">
-                  <WifiOff size={12} />
-                  <span>REST fallback</span>
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
       {renderStatusNotice()}
 
       <div className="chat-workspace">
         <aside className="rooms-panel">
           <div className="rooms-panel-header">
-            <div>
-              <h3>Chat Rooms</h3>
-              <span>{rooms.length} total</span>
+            <div className="rooms-heading">
+              <Link to="/documents" className="icon-button" title="Back to documents" aria-label="Back to documents">
+                <ArrowLeft size={18} />
+              </Link>
+              <div>
+                <h3>Chat Rooms</h3>
+                <span>{rooms.length} total</span>
+              </div>
             </div>
             <button
               type="button"
@@ -513,6 +531,13 @@ const DocumentChat = () => {
             >
               <Plus size={18} />
             </button>
+          </div>
+
+          <div className="document-context">
+            <strong title={fileDetails.file_name}>{fileDetails.file_name}</strong>
+            <div className="meta-row">
+              <span className="status-chip">{fileDetails.status}</span>
+            </div>
           </div>
 
           <div className="rooms-list">
@@ -546,6 +571,17 @@ const DocumentChat = () => {
               <h3>{selectedRoom?.name || 'No chat room selected'}</h3>
               <span>{selectedRoom ? 'Message history' : 'Create a room to begin'}</span>
             </div>
+            {isConnected ? (
+              <span className="connection-pill online" title={`Connected - ${pendingCount} pending`}>
+                <Wifi size={12} />
+                <span>Realtime</span>
+              </span>
+            ) : (
+              <span className="connection-pill offline" title="REST fallback will be used">
+                <WifiOff size={12} />
+                <span>REST fallback</span>
+              </span>
+            )}
           </div>
 
           <div className="chat-messages-container">
@@ -669,12 +705,13 @@ const DocumentChat = () => {
         .document-chat-page {
           display: flex;
           flex-direction: column;
-          min-height: calc(100vh - 5rem);
+          height: 100%;
+          min-height: 0;
           background-color: var(--bg-card);
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border: 0;
+          border-radius: 0;
           overflow: hidden;
-          box-shadow: var(--shadow-sm);
+          box-shadow: none;
         }
 
         .chat-loading-screen,
@@ -840,6 +877,13 @@ const DocumentChat = () => {
           border-bottom: 1px solid var(--border-color);
         }
 
+        .rooms-heading {
+          min-width: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
         .rooms-panel-header h3,
         .conversation-header h3 {
           font-size: 0.98rem;
@@ -852,11 +896,28 @@ const DocumentChat = () => {
           font-size: 0.78rem;
         }
 
+        .document-context {
+          padding: 0.75rem 1rem;
+          border-bottom: 1px solid var(--border-color);
+          background-color: var(--bg-card);
+        }
+
+        .document-context strong {
+          display: block;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: 0.82rem;
+          color: var(--text-secondary);
+        }
+
         .rooms-list {
           display: flex;
           flex-direction: column;
           gap: 0.4rem;
           padding: 0.75rem;
+          flex: 1;
+          min-height: 0;
           overflow-y: auto;
         }
 
@@ -936,6 +997,7 @@ const DocumentChat = () => {
           padding: 1rem 1.25rem;
           border-bottom: 1px solid var(--border-color);
           background-color: var(--bg-card);
+          flex-shrink: 0;
         }
 
         .conversation-header h3 {
@@ -947,9 +1009,10 @@ const DocumentChat = () => {
 
         .chat-messages-container {
           flex: 1;
-          min-height: 420px;
+          min-height: 0;
           overflow-y: auto;
           padding: 1.25rem;
+          overscroll-behavior: contain;
         }
 
         .messages-scroller {
@@ -1053,6 +1116,7 @@ const DocumentChat = () => {
           padding: 0.95rem 1.25rem;
           border-top: 1px solid var(--border-color);
           background-color: var(--bg-card);
+          flex-shrink: 0;
         }
 
         .chat-input-field {
@@ -1128,15 +1192,18 @@ const DocumentChat = () => {
 
         @media (max-width: 900px) {
           .document-chat-page {
-            min-height: calc(100vh - 2rem);
+            height: 100%;
+            min-height: 0;
           }
 
           .chat-workspace {
             grid-template-columns: 1fr;
+            grid-template-rows: auto minmax(0, 1fr);
           }
 
           .rooms-panel {
             max-height: 230px;
+            min-height: 170px;
             border-right: none;
             border-bottom: 1px solid var(--border-color);
           }
@@ -1144,6 +1211,7 @@ const DocumentChat = () => {
           .rooms-list {
             flex-direction: row;
             overflow-x: auto;
+            overflow-y: hidden;
           }
 
           .room-item {
@@ -1151,7 +1219,7 @@ const DocumentChat = () => {
           }
 
           .chat-messages-container {
-            min-height: 360px;
+            min-height: 0;
           }
         }
 

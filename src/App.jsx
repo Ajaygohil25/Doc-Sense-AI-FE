@@ -1,5 +1,4 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -24,12 +23,14 @@ import './App.css';
 const AuthenticatedLayout = ({ children }) => {
   const { sidebarState, setSidebarExpanded } = useAuth();
   const { isMobile } = useResponsive();
+  const location = useLocation();
+  const isDocumentChatPage = /^\/documents\/[^/]+\/chat\/?$/.test(location.pathname);
 
   return (
-    <div className={`app-container sidebar-${sidebarState} ${isMobile ? 'mobile' : 'desktop'}`}>
-      <Sidebar />
+    <div className={`app-container sidebar-${sidebarState} ${isMobile ? 'mobile' : 'desktop'} ${isDocumentChatPage ? 'chat-layout' : ''}`}>
+      {!isDocumentChatPage && <Sidebar />}
       
-      {sidebarState === 'hidden' && (
+      {!isDocumentChatPage && sidebarState === 'hidden' && (
         <button 
           className="show-sidebar-btn"
           onClick={() => setSidebarExpanded()}

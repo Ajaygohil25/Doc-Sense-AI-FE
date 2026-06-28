@@ -1,6 +1,24 @@
 /* App-specific CSS styles. Global styles are defined in index.css */
 
 /* ===== SHOW SIDEBAR BUTTON ===== */
+.app-container.chat-layout {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-container.chat-layout .main-content,
+.app-container.chat-layout .content-body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-container.chat-layout .content-body {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
 .show-sidebar-btn {
   position: fixed;
   left: 1rem;
@@ -87,6 +105,10 @@
     margin: 0;
   }
 
+  .app-container.chat-layout.mobile .content-body {
+    padding: 0;
+  }
+
   .app-container.mobile h1 {
     font-size: 1.75rem;
   }
@@ -104,6 +126,10 @@
 @media (max-width: 374px) {
   .content-body {
     padding: 1rem;
+  }
+
+  .app-container.chat-layout .content-body {
+    padding: 0;
   }
 
   h1 {
@@ -154,12 +180,20 @@
     padding: 1.5rem;
     max-width: 100%;
   }
+
+  .app-container.chat-layout .content-body {
+    padding: 0;
+  }
 }
 
 /* ===== LANDSCAPE ORIENTATION ===== */
 @media (orientation: landscape) and (max-width: 1024px) {
   .content-body {
     padding: 1rem 1.5rem;
+  }
+
+  .app-container.chat-layout .content-body {
+    padding: 0;
   }
 
   .show-sidebar-btn {
@@ -188,6 +222,11 @@
     padding: 2rem;
     max-width: 1200px;
   }
+
+  .app-container.chat-layout .content-body {
+    max-width: none;
+    padding: 0;
+  }
 }
 
 /* ===== LARGE DESKTOP (1280px+) ===== */
@@ -195,6 +234,11 @@
   .content-body {
     padding: 2.5rem;
     max-width: 1400px;
+  }
+
+  .app-container.chat-layout .content-body {
+    max-width: none;
+    padding: 0;
   }
 
   .main-content {

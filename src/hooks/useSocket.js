@@ -14,6 +14,7 @@ export const useSocket = () => {
   // Response state
   const [lastResponse, setLastResponse] = useState(null);
   const [lastStreamEvent, setLastStreamEvent] = useState(null);
+  const [lastChatMessage, setLastChatMessage] = useState(null);
   const [lastError, setLastError] = useState(null);
   const [socketError, setSocketError] = useState(null);
   
@@ -125,12 +126,26 @@ export const useSocket = () => {
 
     socket.on('connect_error', (err) => {
       console.error('Connection error:', err);
-      setSocketError('Authentication or connection failed.');
+      setSocketError(err?.message || 'Authentication or connection failed.');
       setIsConnected(false);
       setLoadingResponse(false); // NEW: Clear loading on connection error
     });
 
     // ========== QUESTION/RESPONSE EVENTS ==========
+
+    socket.on('chat_message_created', (data) => {
+      if (!data || !data.chat_room_id || !data.message || !data.sender) {
+        console.error('Invalid chat message format received:', data);
+        setSocketError('Received malformed chat message from server');
+        return;
+      }
+
+      setLastChatMessage({
+        ...data,
+        received_at: Date.now()
+      });
+      setSocketError(null);
+    });
 
     socket.on('question_response_start', (data) => {
       setLastStreamEvent({
@@ -393,6 +408,7 @@ export const useSocket = () => {
     // Response state
     lastResponse,
     lastStreamEvent,
+    lastChatMessage,
     lastError,
     socketError,
     loadingResponse,
