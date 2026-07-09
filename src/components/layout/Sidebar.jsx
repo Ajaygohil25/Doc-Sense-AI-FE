@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { 
   UploadCloud, 
   FileText, 
+  FolderKanban,
   User, 
   LogOut, 
   Sun, 
@@ -77,6 +78,14 @@ const Sidebar = () => {
         >
           <FileText size={20} />
           <span>My Documents</span>
+        </NavLink>
+
+        <NavLink
+          to="/projects"
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        >
+          <FolderKanban size={20} />
+          <span>Projects</span>
         </NavLink>
 
         <NavLink 

@@ -15,6 +15,9 @@ import ResetPassword from './pages/auth/ResetPassword';
 import Home from './pages/dashboard/Home';
 import DocumentsList from './pages/dashboard/DocumentsList';
 import DocumentChat from './pages/document/DocumentChat';
+import ProjectsList from './pages/projects/ProjectsList';
+import ProjectDetail from './pages/projects/ProjectDetail';
+import ProjectChat from './pages/projects/ProjectChat';
 import Profile from './pages/profile/Profile';
 
 import './App.css';
@@ -25,12 +28,14 @@ const AuthenticatedLayout = ({ children }) => {
   const { isMobile } = useResponsive();
   const location = useLocation();
   const isDocumentChatPage = /^\/documents\/[^/]+\/chat\/?$/.test(location.pathname);
+  const isProjectChatPage = /^\/projects\/[^/]+\/chat\/?$/.test(location.pathname);
+  const isChatPage = isDocumentChatPage || isProjectChatPage;
 
   return (
-    <div className={`app-container sidebar-${sidebarState} ${isMobile ? 'mobile' : 'desktop'} ${isDocumentChatPage ? 'chat-layout' : ''}`}>
-      {!isDocumentChatPage && <Sidebar />}
+    <div className={`app-container sidebar-${sidebarState} ${isMobile ? 'mobile' : 'desktop'} ${isChatPage ? 'chat-layout' : ''}`}>
+      {!isChatPage && <Sidebar />}
       
-      {!isDocumentChatPage && sidebarState === 'hidden' && (
+      {!isChatPage && sidebarState === 'hidden' && (
         <button 
           className="show-sidebar-btn"
           onClick={() => setSidebarExpanded()}
@@ -91,6 +96,39 @@ function App() {
                 <ProtectedRoute>
                   <AuthenticatedLayout>
                     <DocumentChat />
+                  </AuthenticatedLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/projects"
+              element={
+                <ProtectedRoute>
+                  <AuthenticatedLayout>
+                    <ProjectsList />
+                  </AuthenticatedLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/projects/:projectId"
+              element={
+                <ProtectedRoute>
+                  <AuthenticatedLayout>
+                    <ProjectDetail />
+                  </AuthenticatedLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/projects/:projectId/chat"
+              element={
+                <ProtectedRoute>
+                  <AuthenticatedLayout>
+                    <ProjectChat />
                   </AuthenticatedLayout>
                 </ProtectedRoute>
               }
