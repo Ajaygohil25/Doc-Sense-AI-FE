@@ -2,8 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { API_URL } from '../services/api';
 
-const buildRequestKey = (fileId, chatRoomId, messageId) => (
-  `${fileId}-${chatRoomId || 'default'}-${messageId}`
+const buildRequestKey = (scopeType, scopeId, chatRoomId, messageId) => (
+  `${scopeType}-${scopeId}-${chatRoomId || 'default'}-${messageId}`
 );
 
 export const useSocket = () => {
@@ -35,19 +35,23 @@ export const useSocket = () => {
       return null;
     }
 
-    if (data.file_id) {
-      const directKey = buildRequestKey(data.file_id, data.chat_room_id, data.request_id);
+    const incomingScopeType = data.project_id ? 'project' : 'file';
+    const incomingScopeId = data.project_id || data.file_id;
+
+    if (incomingScopeId) {
+      const directKey = buildRequestKey(incomingScopeType, incomingScopeId, data.chat_room_id, data.request_id);
       if (pendingRequests.current.has(directKey)) {
         return directKey;
       }
     }
 
     for (const [requestKey, metadata] of pendingRequests.current) {
-      const sameFile = !data.file_id || String(metadata.fileId) === String(data.file_id);
+      const sameScope = !incomingScopeId
+        || (metadata.scopeType === incomingScopeType && String(metadata.scopeId) === String(incomingScopeId));
       const sameMessage = metadata.messageId === data.request_id;
       const sameRoom = !data.chat_room_id || String(metadata.chatRoomId) === String(data.chat_room_id);
 
-      if (sameFile && sameMessage && sameRoom) {
+      if (sameScope && sameMessage && sameRoom) {
         return requestKey;
       }
     }
@@ -178,7 +182,7 @@ export const useSocket = () => {
       console.log('Received response from server:', data);
 
       // NEW: Comprehensive response validation
-      if (!data || !data.file_id || !data.response) {
+      if (!data || (!data.file_id && !data.project_id) || !data.response) {
         console.error('Invalid response format received:', data);
         setSocketError('Received malformed response from server');
         setLoadingResponse(false);
@@ -334,15 +338,16 @@ export const useSocket = () => {
    * @param {string} messageId - Unique message ID for tracking
    * @returns {boolean} - true if emitted successfully, false otherwise
    */
-  const askQuestion = useCallback((fileId, chatRoomId, question, messageId) => {
+  const askScopedQuestion = useCallback((scopeType, scopeId, chatRoomId, question, messageId) => {
     if (!socketRef.current || !isConnected) {
       console.warn('Socket not connected. Cannot emit ask_question.');
       return false;
     }
 
-    if (!fileId || !chatRoomId || !question || !messageId) {
-      console.error('Missing required parameters for askQuestion', {
-        fileId,
+    if (!scopeId || !chatRoomId || !question || !messageId) {
+      console.error('Missing required parameters for askScopedQuestion', {
+        scopeType,
+        scopeId,
         chatRoomId,
         question,
         messageId
@@ -352,9 +357,10 @@ export const useSocket = () => {
 
     try {
       // NEW: Start tracking this request
-      const requestId = buildRequestKey(fileId, chatRoomId, messageId);
+      const requestId = buildRequestKey(scopeType, scopeId, chatRoomId, messageId);
       pendingRequests.current.set(requestId, {
-        fileId,
+        scopeType,
+        scopeId,
         chatRoomId,
         messageId,
         question,
@@ -368,10 +374,14 @@ export const useSocket = () => {
       setSocketError(null);
 
       console.log(`Emitting ask_question: ${requestId}`);
-      
+
+      const scopePayload = scopeType === 'project'
+        ? { project_id: scopeId }
+        : { file_id: scopeId };
+
       // NEW: Include request_id for backend response matching
       socketRef.current.emit('ask_question', {
-        file_id: fileId,
+        ...scopePayload,
         chat_room_id: chatRoomId,
         question: question,
         request_id: messageId
@@ -380,17 +390,25 @@ export const useSocket = () => {
       return true;
     } catch (err) {
       console.error('Error emitting ask_question:', err);
-      pendingRequests.current.delete(buildRequestKey(fileId, chatRoomId, messageId));
+      pendingRequests.current.delete(buildRequestKey(scopeType, scopeId, chatRoomId, messageId));
       setLoadingResponse(false);
       return false;
     }
   }, [isConnected]);
 
+  const askQuestion = useCallback((fileId, chatRoomId, question, messageId) => (
+    askScopedQuestion('file', fileId, chatRoomId, question, messageId)
+  ), [askScopedQuestion]);
+
+  const askProjectQuestion = useCallback((projectId, chatRoomId, question, messageId) => (
+    askScopedQuestion('project', projectId, chatRoomId, question, messageId)
+  ), [askScopedQuestion]);
+
   /**
    * NEW: Check if there's a pending request for given file and message
    */
   const hasPendingRequest = useCallback((fileId, chatRoomId, messageId) => {
-    return pendingRequests.current.has(buildRequestKey(fileId, chatRoomId, messageId));
+    return pendingRequests.current.has(buildRequestKey('file', fileId, chatRoomId, messageId));
   }, []);
 
   /**
@@ -415,6 +433,7 @@ export const useSocket = () => {
     
     // Actions
     askQuestion,
+    askProjectQuestion,
     joinChannel,
     leaveChannel,
     reconnect: connectSocket,
