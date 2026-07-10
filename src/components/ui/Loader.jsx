@@ -40,14 +40,16 @@ export const SkeletonTable = ({ rows = 5 }) => {
         .skeleton-table {
           width: 100%;
           border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-lg);
-          background-color: var(--bg-card);
+          overflow: hidden;
           padding: 1rem;
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
+          box-shadow: var(--shadow-sm);
         }
         
         .skeleton-header-row {
           height: 40px;
-          background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-primary) 50%, var(--border-color) 75%);
+          background: linear-gradient(90deg, var(--accent-light) 20%, var(--mesh-magenta) 50%, var(--accent-light) 80%);
           background-size: 200% 100%;
           animation: loading-pulse 1.5s infinite;
           border-radius: var(--border-radius-sm);
@@ -68,10 +70,10 @@ export const SkeletonTable = ({ rows = 5 }) => {
         
         .skeleton-cell {
           height: 16px;
-          background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-primary) 50%, var(--border-color) 75%);
+          background: linear-gradient(90deg, var(--accent-light) 20%, var(--mesh-primary) 50%, var(--accent-light) 80%);
           background-size: 200% 100%;
           animation: loading-pulse 1.5s infinite;
-          border-radius: 4px;
+          border-radius: var(--border-radius-pill);
         }
         
         .cell-long { flex: 4; }
@@ -106,21 +108,21 @@ export const SkeletonChat = () => {
         .skeleton-bubble {
           max-width: 60%;
           height: 60px;
-          border-radius: 12px;
-          background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-primary) 50%, var(--border-color) 75%);
+          border-radius: var(--border-radius-xl);
+          background: linear-gradient(90deg, var(--accent-light) 20%, var(--mesh-magenta) 50%, var(--accent-light) 80%);
           background-size: 200% 100%;
           animation: loading-pulse 1.5s infinite;
         }
         
         .skeleton-bubble.left {
           align-self: flex-start;
-          border-bottom-left-radius: 2px;
+          border-bottom-left-radius: var(--border-radius-sm);
           width: 50%;
         }
         
         .skeleton-bubble.right {
           align-self: flex-end;
-          border-bottom-right-radius: 2px;
+          border-bottom-right-radius: var(--border-radius-sm);
           width: 40%;
         }
       `}</style>

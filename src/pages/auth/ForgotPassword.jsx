@@ -85,7 +85,7 @@ const ForgotPassword = () => {
               </div>
 
               <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                {loading ? <Spinner size={18} color="#fff" /> : 'Send Reset Link'}
+                {loading ? <Spinner size={18} color="var(--on-accent)" /> : 'Send Reset Link'}
               </button>
             </form>
           ) : (
@@ -139,7 +139,7 @@ const ForgotPassword = () => {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background-color: var(--accent-light);
+          background-color: var(--bg-strong);
           color: var(--accent-color);
           display: flex;
           align-items: center;
@@ -149,7 +149,7 @@ const ForgotPassword = () => {
 
         .success-state h3 {
           font-size: 1.5rem;
-          font-weight: 700;
+          font-weight: 800;
           margin-bottom: 0.75rem;
         }
 
@@ -165,7 +165,7 @@ const ForgotPassword = () => {
           color: var(--text-muted) !important;
           background-color: var(--bg-primary);
           padding: 0.75rem;
-          border-radius: var(--border-radius-md);
+          border-radius: var(--border-radius-xl);
           border: 1px dashed var(--border-color);
         }
       `}</style>

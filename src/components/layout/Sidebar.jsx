@@ -1,14 +1,14 @@
-import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { 
-  UploadCloud, 
-  FileText, 
+import {
+  Home,
+  UploadCloud,
+  FileText,
   FolderKanban,
-  User, 
-  LogOut, 
-  Sun, 
-  Moon, 
+  User,
+  LogOut,
+  Sun,
+  Moon,
   BrainCircuit,
   ChevronLeft,
   ChevronRight,
@@ -16,7 +16,16 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const { user, logout, theme, toggleTheme, sidebarState, setSidebarMinimized, setSidebarExpanded, setSidebarHidden } = useAuth();
+  const {
+    user,
+    logout,
+    theme,
+    toggleTheme,
+    sidebarState,
+    setSidebarMinimized,
+    setSidebarExpanded,
+    setSidebarHidden
+  } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -42,63 +51,54 @@ const Sidebar = () => {
   return (
     <aside className={`sidebar sidebar-${sidebarState}`}>
       <div className="sidebar-brand">
-        <BrainCircuit size={28} className="brand-icon" />
+        <span className="brand-icon-wrap" aria-hidden="true">
+          <BrainCircuit size={25} className="brand-icon" />
+        </span>
         {sidebarState !== 'hidden' && (
           <>
             <span className="brand-text">Doc-Sense AI</span>
-            <button 
+            <button
               className="sidebar-toggle-btn minimize-btn"
               onClick={handleToggleMinimize}
               title={sidebarState === 'expanded' ? 'Minimize sidebar' : 'Expand sidebar'}
               aria-label="Toggle sidebar size"
               aria-pressed={sidebarState === 'minimized'}
             >
-              {sidebarState === 'expanded' ? (
-                <ChevronLeft size={18} />
-              ) : (
-                <ChevronRight size={18} />
-              )}
+              {sidebarState === 'expanded' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
             </button>
           </>
         )}
       </div>
 
-      <nav className="sidebar-nav">
-        <NavLink 
-          to="/" 
-          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-        >
+      <nav className="sidebar-nav" aria-label="Primary navigation">
+        <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} end>
+          <Home size={20} />
+          <span>Home</span>
+        </NavLink>
+
+        <NavLink to="/upload" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <UploadCloud size={20} />
           <span>Upload PDF</span>
         </NavLink>
 
-        <NavLink 
-          to="/documents" 
-          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-        >
+        <NavLink to="/documents" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <FileText size={20} />
           <span>My Documents</span>
         </NavLink>
 
-        <NavLink
-          to="/projects"
-          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-        >
+        <NavLink to="/projects" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <FolderKanban size={20} />
           <span>Projects</span>
         </NavLink>
 
-        <NavLink 
-          to="/profile" 
-          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-        >
+        <NavLink to="/profile" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <User size={20} />
-          <span>Profile & Security</span>
+          <span>Profile &amp; Security</span>
         </NavLink>
       </nav>
 
       <div className="sidebar-footer">
-        <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle theme">
+        <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle theme" aria-label="Toggle theme">
           {theme === 'dark' ? (
             <>
               <Sun size={18} />
@@ -128,7 +128,7 @@ const Sidebar = () => {
         </button>
 
         {sidebarState !== 'hidden' && (
-          <button 
+          <button
             className="hide-sidebar-btn"
             onClick={() => setSidebarHidden()}
             title="Hide sidebar"
@@ -142,309 +142,313 @@ const Sidebar = () => {
 
       <style>{`
         .sidebar {
-          width: var(--sidebar-width);
-          background-color: var(--bg-sidebar);
-          color: var(--sidebar-text);
-          display: flex;
-          flex-direction: column;
-          border-right: 1px solid var(--border-color);
-          height: 100vh;
           position: sticky;
           top: 0;
           z-index: 100;
-          transition: width var(--sidebar-transition-duration) ease, transform var(--sidebar-transition-duration) ease;
+          display: flex;
+          flex-direction: column;
+          width: var(--sidebar-width);
+          height: 100vh;
           overflow: hidden;
+          color: var(--sidebar-text);
+          background: var(--bg-sidebar);
+          border-right: 1px solid var(--sidebar-border);
+          box-shadow: 12px 0 36px rgba(25, 28, 82, 0.08);
+          backdrop-filter: blur(24px) saturate(130%);
+          transition: width var(--sidebar-transition-duration) ease, transform var(--sidebar-transition-duration) ease;
         }
 
-        .sidebar.sidebar-minimized {
-          width: var(--sidebar-minimized-width);
+        .sidebar::before {
+          content: '';
+          position: absolute;
+          inset: 0 0 auto;
+          height: 190px;
+          pointer-events: none;
+          background:
+            radial-gradient(circle at 18% 0%, var(--mesh-primary), transparent 62%),
+            radial-gradient(circle at 92% 8%, var(--mesh-magenta), transparent 54%);
+          opacity: 0.78;
         }
+
+        .sidebar.sidebar-minimized { width: var(--sidebar-minimized-width); }
 
         .sidebar.sidebar-hidden {
-          transform: translateX(-100%);
           position: fixed;
           left: 0;
-          width: var(--sidebar-width);
           z-index: 999;
-          box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+          width: var(--sidebar-width);
+          transform: translateX(-100%);
+          box-shadow: var(--shadow-lg);
         }
 
         .sidebar-brand {
-          padding: 2rem 1.5rem;
+          position: relative;
+          z-index: 1;
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          min-height: 88px;
+          padding: 1.25rem 1rem 1.25rem 1.25rem;
+          border-bottom: 1px solid var(--sidebar-border);
         }
 
-        .brand-icon {
-          color: var(--accent-color);
+        .brand-icon-wrap {
+          display: grid;
+          flex: 0 0 auto;
+          width: 46px;
+          height: 46px;
+          place-items: center;
+          color: #ffffff;
+          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
+          border: 1px solid rgba(255, 255, 255, 0.24);
+          border-radius: 15px;
+          box-shadow: 0 12px 28px var(--accent-glow);
         }
+
+        .brand-icon { color: inherit; }
 
         .brand-text {
+          min-width: 0;
+          color: var(--sidebar-text);
           font-family: var(--font-display);
-          font-weight: 700;
-          font-size: 1.25rem;
-          letter-spacing: -0.5px;
-          color: #ffffff;
+          font-size: 1.22rem;
+          font-weight: 800;
+          letter-spacing: -0.045em;
+          white-space: nowrap;
         }
 
-        .sidebar.sidebar-minimized .brand-text {
-          display: none;
+        .sidebar-toggle-btn,
+        .theme-toggle-btn,
+        .logout-btn,
+        .hide-sidebar-btn {
+          min-width: 44px;
+          min-height: 44px;
+          font-family: var(--font-sans);
         }
 
         .sidebar-toggle-btn.minimize-btn {
-          background: transparent;
-          border: none;
-          color: var(--sidebar-text-muted);
-          cursor: pointer;
-          padding: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          border-radius: 6px;
+          display: grid;
+          flex: 0 0 auto;
+          width: 44px;
+          height: 44px;
           margin-left: auto;
+          padding: 0;
+          place-items: center;
+          color: var(--sidebar-text-muted);
+          background: var(--sidebar-user-bg);
+          border: 1px solid var(--sidebar-control-border);
+          border-radius: var(--border-radius-md);
+          cursor: pointer;
           transition: all var(--transition-fast);
         }
 
         .sidebar-toggle-btn.minimize-btn:hover {
-          background-color: rgba(255, 255, 255, 0.1);
-          color: #ffffff;
-        }
-
-        .sidebar-toggle-btn.minimize-btn:focus {
-          outline: 2px solid var(--accent-color);
-          outline-offset: 2px;
+          color: var(--sidebar-text);
+          background: var(--sidebar-hover-bg);
+          border-color: var(--sidebar-control-border-hover);
         }
 
         .sidebar-nav {
-          padding: 1.5rem 0.75rem;
+          position: relative;
+          z-index: 1;
           display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
           flex: 1;
-        }
-
-        .sidebar.sidebar-minimized .sidebar-nav {
-          padding: 1rem 0.5rem;
+          flex-direction: column;
+          gap: 0.45rem;
+          padding: 1.25rem 0.9rem;
         }
 
         .nav-item {
+          position: relative;
           display: flex;
           align-items: center;
-          gap: 0.875rem;
-          padding: 0.75rem 1rem;
+          gap: 0.85rem;
+          min-height: 48px;
+          padding: 0.78rem 0.95rem;
+          overflow: hidden;
           color: var(--sidebar-text-muted);
-          text-decoration: none;
+          background: transparent;
+          border: 1px solid transparent;
           border-radius: var(--border-radius-md);
-          font-size: 0.9rem;
-          font-weight: 500;
+          font-size: 0.92rem;
+          font-weight: 600;
+          text-decoration: none;
           transition: all var(--transition-fast);
         }
 
-        .sidebar.sidebar-minimized .nav-item {
-          justify-content: center;
-          padding: 0.75rem 0.5rem;
-        }
-
-        .sidebar.sidebar-minimized .nav-item span {
-          display: none;
-        }
+        .nav-item svg { flex: 0 0 auto; }
 
         .nav-item:hover {
-          color: #ffffff;
-          background-color: var(--sidebar-hover-bg);
-        }
-
-        .nav-item:focus {
-          outline: 2px solid var(--accent-color);
-          outline-offset: -2px;
+          color: var(--sidebar-text);
+          background: var(--sidebar-hover-bg);
+          border-color: var(--sidebar-border);
+          transform: translateX(2px);
         }
 
         .nav-item.active {
           color: #ffffff;
-          background-color: var(--sidebar-active-bg);
-          border-left: 3px solid var(--accent-color);
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
+          background: var(--sidebar-active-bg);
+          border-color: rgba(255, 255, 255, 0.18);
+          box-shadow: 0 12px 28px var(--accent-glow);
         }
 
-        .sidebar.sidebar-minimized .nav-item.active {
-          border-left: none;
-          border-radius: var(--border-radius-md);
+        .nav-item.active::after {
+          content: '';
+          position: absolute;
+          top: 9px;
+          right: 8px;
+          width: 6px;
+          height: 6px;
+          background: var(--intent-color);
+          border-radius: 50%;
+          box-shadow: 0 0 0 4px rgba(53, 237, 126, 0.16);
         }
 
         .sidebar-footer {
-          padding: 1rem 0.75rem 1.5rem 0.75rem;
+          position: relative;
+          z-index: 1;
           display: flex;
           flex-direction: column;
-          gap: 1rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          gap: 0.7rem;
+          padding: 1rem 0.9rem 1.1rem;
+          border-top: 1px solid var(--sidebar-border);
         }
 
-        .theme-toggle-btn {
+        .theme-toggle-btn,
+        .logout-btn,
+        .hide-sidebar-btn {
           display: flex;
           align-items: center;
-          gap: 0.875rem;
-          padding: 0.625rem 1rem;
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: var(--border-radius-md);
-          color: var(--sidebar-text-muted);
-          font-size: 0.85rem;
-          cursor: pointer;
+          gap: 0.75rem;
           width: 100%;
+          padding: 0.65rem 0.85rem;
+          color: var(--sidebar-text-muted);
+          background: var(--sidebar-user-bg);
+          border: 1px solid var(--sidebar-control-border);
+          border-radius: var(--border-radius-md);
+          font-size: 0.84rem;
+          font-weight: 600;
           text-align: left;
+          cursor: pointer;
           transition: all var(--transition-fast);
         }
 
-        .sidebar.sidebar-minimized .theme-toggle-btn {
-          justify-content: center;
-          padding: 0.625rem;
-          width: 100%;
-        }
-
-        .sidebar.sidebar-minimized .theme-toggle-btn span {
-          display: none;
-        }
-
-        .theme-toggle-btn:hover {
-          color: #ffffff;
-          background-color: var(--sidebar-hover-bg);
-          border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .theme-toggle-btn:focus {
-          outline: 2px solid var(--accent-color);
-          outline-offset: 2px;
+        .theme-toggle-btn:hover,
+        .hide-sidebar-btn:hover {
+          color: var(--sidebar-text);
+          background: var(--sidebar-hover-bg);
+          border-color: var(--sidebar-control-border-hover);
         }
 
         .user-profile-summary {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding: 0.5rem 0.5rem;
-          background-color: rgba(255, 255, 255, 0.02);
+          min-height: 58px;
+          padding: 0.55rem;
+          background: var(--sidebar-user-bg);
+          border: 1px solid var(--sidebar-border);
           border-radius: var(--border-radius-lg);
         }
 
-        .sidebar.sidebar-minimized .user-profile-summary {
-          justify-content: center;
-          padding: 0.5rem;
-        }
-
         .user-avatar {
-          width: 36px;
-          height: 36px;
+          display: grid;
+          flex: 0 0 auto;
+          width: 40px;
+          height: 40px;
+          place-items: center;
+          color: #ffffff;
+          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
           border-radius: 50%;
-          background-color: var(--accent-color);
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 600;
-          font-size: 0.9rem;
-          flex-shrink: 0;
+          font-size: 0.84rem;
+          font-weight: 800;
+          box-shadow: 0 8px 20px var(--accent-glow);
         }
 
         .user-info {
           display: flex;
-          flex-direction: column;
           min-width: 0;
+          flex-direction: column;
         }
 
-        .sidebar.sidebar-minimized .user-info {
-          display: none;
+        .user-name,
+        .user-email {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .user-name {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #ffffff;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          color: var(--sidebar-text);
+          font-size: 0.84rem;
+          font-weight: 700;
         }
 
         .user-email {
-          font-size: 0.75rem;
           color: var(--sidebar-text-muted);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          font-size: 0.7rem;
         }
 
         .logout-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.875rem;
-          padding: 0.75rem 1rem;
+          color: var(--danger-color);
           background: transparent;
-          border: none;
-          color: #ef4444;
-          font-size: 0.9rem;
-          font-weight: 500;
-          cursor: pointer;
-          width: 100%;
-          text-align: left;
-          border-radius: var(--border-radius-md);
-          transition: all var(--transition-fast);
-        }
-
-        .sidebar.sidebar-minimized .logout-btn {
-          justify-content: center;
-          padding: 0.75rem 0.5rem;
-        }
-
-        .sidebar.sidebar-minimized .logout-btn span {
-          display: none;
+          border-color: transparent;
         }
 
         .logout-btn:hover {
-          background-color: rgba(239, 68, 68, 0.08);
+          background: var(--danger-light);
+          border-color: var(--danger-light);
         }
 
-        .logout-btn:focus {
-          outline: 2px solid var(--accent-color);
-          outline-offset: -2px;
-        }
-
-        .hide-sidebar-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.875rem;
-          padding: 0.625rem 1rem;
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: var(--border-radius-md);
-          color: var(--sidebar-text-muted);
-          font-size: 0.85rem;
-          cursor: pointer;
-          width: 100%;
-          text-align: left;
-          transition: all var(--transition-fast);
-        }
-
-        .sidebar.sidebar-minimized .hide-sidebar-btn {
-          justify-content: center;
-          padding: 0.625rem;
-        }
-
-        .sidebar.sidebar-minimized .hide-sidebar-btn span {
+        .sidebar.sidebar-minimized .brand-text,
+        .sidebar.sidebar-minimized .nav-item span,
+        .sidebar.sidebar-minimized .theme-toggle-btn span,
+        .sidebar.sidebar-minimized .user-info,
+        .sidebar.sidebar-minimized .logout-btn span,
+        .sidebar.sidebar-minimized .hide-sidebar-btn span,
+        .sidebar.sidebar-minimized .minimize-btn {
           display: none;
         }
 
-        .hide-sidebar-btn:hover {
-          color: #ffffff;
-          background-color: var(--sidebar-hover-bg);
-          border-color: rgba(255, 255, 255, 0.2);
+        .sidebar.sidebar-minimized .sidebar-brand,
+        .sidebar.sidebar-minimized .nav-item,
+        .sidebar.sidebar-minimized .theme-toggle-btn,
+        .sidebar.sidebar-minimized .user-profile-summary,
+        .sidebar.sidebar-minimized .logout-btn,
+        .sidebar.sidebar-minimized .hide-sidebar-btn {
+          justify-content: center;
         }
 
-        .hide-sidebar-btn:focus {
-          outline: 2px solid var(--accent-color);
-          outline-offset: 2px;
+        .sidebar.sidebar-minimized .sidebar-brand { padding-inline: 0; }
+        .sidebar.sidebar-minimized .sidebar-nav { padding-inline: 0.7rem; }
+        .sidebar.sidebar-minimized .nav-item { padding-inline: 0.5rem; }
+        .sidebar.sidebar-minimized .nav-item.active::after { display: none; }
+        .sidebar.sidebar-minimized .sidebar-footer { padding-inline: 0.7rem; }
+
+        @media (max-width: 767px) {
+          .sidebar {
+            position: fixed;
+            left: 0;
+            width: 74px;
+            box-shadow: 12px 0 36px rgba(7, 9, 42, 0.2);
+          }
+
+          .sidebar-brand { justify-content: center; padding-inline: 0; }
+          .sidebar .brand-text,
+          .sidebar .minimize-btn,
+          .sidebar .nav-item span,
+          .sidebar .theme-toggle-btn span,
+          .sidebar .user-info,
+          .sidebar .logout-btn span,
+          .sidebar .hide-sidebar-btn span { display: none; }
+          .sidebar .sidebar-nav,
+          .sidebar .sidebar-footer { padding-inline: 0.65rem; }
+          .sidebar .nav-item,
+          .sidebar .theme-toggle-btn,
+          .sidebar .user-profile-summary,
+          .sidebar .logout-btn,
+          .sidebar .hide-sidebar-btn { justify-content: center; padding-inline: 0.5rem; }
+          .sidebar .nav-item.active::after { display: none; }
         }
       `}</style>
     </aside>
