@@ -191,14 +191,14 @@ const UploadPage = () => {
                 
                 {uploadedFileId ? (
                   <button 
-                    className="btn btn-intent" 
+                    className="btn btn-primary"
                     onClick={() => navigate(`/documents/${uploadedFileId}/chat`)}
                   >
                     Start Chatting
                   </button>
                 ) : (
                   <button 
-                    className="btn btn-intent" 
+                    className="btn btn-primary"
                     onClick={handleUpload} 
                     disabled={uploading}
                   >
@@ -247,19 +247,15 @@ const UploadPage = () => {
 
         .dashboard-header h1 {
           max-width: 12ch;
-          font-size: clamp(2.8rem, 7vw, 5.8rem);
+          font-size: clamp(2rem, 4vw, 2.75rem);
           font-weight: 800;
-          line-height: 0.9;
-          text-transform: uppercase;
+          line-height: 1.2;
         }
 
         .upload-container {
           padding: clamp(1rem, 4vw, 2.5rem);
-          background:
-            radial-gradient(circle at 8% 0%, var(--mesh-primary), transparent 34%),
-            radial-gradient(circle at 100% 92%, var(--mesh-magenta), transparent 36%),
-            var(--bg-card);
-          border-radius: var(--border-radius-xxl);
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
         }
 
         .dropzone {
@@ -268,9 +264,9 @@ const UploadPage = () => {
           justify-content: center;
           min-height: 330px;
           padding: clamp(2rem, 6vw, 4.5rem) 1.5rem;
-          background: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+          background: var(--bg-elevated);
           border: 2px dashed var(--border-strong);
-          border-radius: 32px;
+          border-radius: var(--border-radius-xl);
           cursor: pointer;
           transition: all var(--transition-normal);
         }
@@ -280,7 +276,6 @@ const UploadPage = () => {
           background: var(--accent-light);
           border-color: var(--accent-color);
           box-shadow: inset 0 0 0 1px var(--accent-light);
-          transform: translateY(-2px);
         }
 
         .dropzone.has-file {
@@ -307,15 +302,15 @@ const UploadPage = () => {
           height: 82px;
           margin-bottom: 0.85rem;
           place-items: center;
-          color: #ffffff;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 26px;
-          box-shadow: 0 18px 38px var(--accent-glow);
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-lg);
+          box-shadow: var(--shadow-sm);
           transition: all var(--transition-normal);
         }
 
-        .dropzone:hover .upload-icon-wrapper { transform: translateY(-4px) rotate(-2deg); }
+        .dropzone:hover .upload-icon-wrapper { border-color: var(--accent-color); }
         .dropzone-content h3 { font-size: clamp(1.35rem, 3vw, 2rem); }
         .browse-text { color: var(--text-secondary); font-size: 0.92rem; }
         .browse-link { color: var(--accent-link); font-weight: 700; text-decoration: underline; }
@@ -340,13 +335,13 @@ const UploadPage = () => {
           box-shadow: var(--shadow-sm);
         }
 
-        .file-icon { flex: 0 0 auto; color: var(--accent-magenta); }
+        .file-icon { flex: 0 0 auto; color: var(--accent-color); }
         .file-details { display: flex; min-width: 0; flex-direction: column; text-align: left; }
         .file-name { overflow: hidden; color: var(--text-primary); font-size: 0.94rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
         .file-size { margin-top: 0.15rem; color: var(--text-secondary); font-size: 0.8rem; }
         .upload-progress-wrapper { display: flex; flex-direction: column; gap: 0.55rem; text-align: left; }
         .progress-bar-bg { height: 9px; overflow: hidden; background: var(--bg-strong); border-radius: var(--border-radius-pill); }
-        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-color), var(--accent-magenta)); border-radius: inherit; transition: width 0.2s ease; }
+        .progress-bar-fill { height: 100%; background: var(--accent-color); border-radius: inherit; transition: width 0.2s ease; }
         .progress-bar-fill.complete { background: var(--success-color); }
         .progress-text-row { display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 0.76rem; }
         .upload-success-state { display: flex; align-items: center; gap: 0.5rem; color: var(--success-color); font-size: 0.88rem; font-weight: 700; }
@@ -373,10 +368,10 @@ const UploadPage = () => {
           width: 46px;
           height: 46px;
           place-items: center;
-          color: #ffffff;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border: 1px solid var(--border-color);
           border-radius: var(--border-radius-md);
-          box-shadow: 0 10px 24px var(--accent-glow);
         }
 
         .info-card h3 { margin-top: auto; font-size: 1.12rem; }

@@ -49,8 +49,7 @@ export const SkeletonTable = ({ rows = 5 }) => {
         
         .skeleton-header-row {
           height: 40px;
-          background: linear-gradient(90deg, var(--accent-light) 20%, var(--mesh-magenta) 50%, var(--accent-light) 80%);
-          background-size: 200% 100%;
+          background: var(--bg-strong);
           animation: loading-pulse 1.5s infinite;
           border-radius: var(--border-radius-sm);
           margin-bottom: 1rem;
@@ -70,8 +69,7 @@ export const SkeletonTable = ({ rows = 5 }) => {
         
         .skeleton-cell {
           height: 16px;
-          background: linear-gradient(90deg, var(--accent-light) 20%, var(--mesh-primary) 50%, var(--accent-light) 80%);
-          background-size: 200% 100%;
+          background: var(--bg-strong);
           animation: loading-pulse 1.5s infinite;
           border-radius: var(--border-radius-pill);
         }
@@ -82,8 +80,8 @@ export const SkeletonTable = ({ rows = 5 }) => {
         .cell-icon { width: 32px; border-radius: 50%; }
         
         @keyframes loading-pulse {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
+          0%, 100% { opacity: 0.55; }
+          50% { opacity: 1; }
         }
       `}</style>
     </div>
@@ -109,8 +107,7 @@ export const SkeletonChat = () => {
           max-width: 60%;
           height: 60px;
           border-radius: var(--border-radius-xl);
-          background: linear-gradient(90deg, var(--accent-light) 20%, var(--mesh-magenta) 50%, var(--accent-light) 80%);
-          background-size: 200% 100%;
+          background: var(--bg-strong);
           animation: loading-pulse 1.5s infinite;
         }
         

@@ -52,7 +52,7 @@ const steps = [
 
 const Home = () => (
   <div className="dashboard-home">
-    <section className="dashboard-hero discord-feature-panel card" aria-labelledby="home-hero-title">
+    <section className="dashboard-hero card" aria-labelledby="home-hero-title">
       <div className="hero-copy">
         <span className="section-kicker">Dashboard</span>
         <h1 id="home-hero-title">Welcome to Doc-Sense AI</h1>
@@ -61,7 +61,7 @@ const Home = () => (
           workspace. Choose the workflow you need and continue from your document history anytime.
         </p>
         <div className="hero-actions" aria-label="Primary actions">
-          <Link className="btn btn-intent" to="/upload">
+          <Link className="btn btn-primary" to="/upload">
             <UploadCloud size={16} aria-hidden="true" />
             Upload a PDF
           </Link>
@@ -162,28 +162,12 @@ const Home = () => (
         grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
         gap: clamp(1.5rem, 4vw, 3rem);
         align-items: stretch;
-        min-height: 470px;
-        padding: clamp(1.75rem, 5vw, 3.5rem);
+        padding: clamp(1.5rem, 4vw, 2.25rem);
         overflow: hidden;
-        background:
-          radial-gradient(circle at 86% 10%, rgba(236, 72, 189, 0.9), transparent 30%),
-          radial-gradient(circle at 92% 92%, rgba(53, 237, 126, 0.24), transparent 30%),
-          linear-gradient(140deg, #10154b 0%, var(--accent-color) 58%, #8538b6 100%);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: var(--border-radius-xxl);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .dashboard-hero::after {
-        content: '';
-        position: absolute;
-        right: -8rem;
-        bottom: -11rem;
-        width: 30rem;
-        height: 30rem;
-        border: 2px solid rgba(255, 255, 255, 0.15);
-        border-radius: 44% 56% 65% 35% / 46% 41% 59% 54%;
-        transform: rotate(-18deg);
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-sm);
       }
 
       .hero-copy,
@@ -202,36 +186,34 @@ const Home = () => (
       .section-kicker {
         width: fit-content;
         padding: 0.38rem 0.72rem;
-        color: var(--accent-magenta);
+        color: var(--accent-color);
         background: var(--accent-light);
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius-pill);
         font-size: 0.72rem;
-        font-weight: 800;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.03em;
       }
 
       .dashboard-hero .section-kicker {
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.13);
-        border-color: rgba(255, 255, 255, 0.22);
+        color: var(--accent-color);
+        background: var(--accent-light);
+        border-color: var(--border-color);
       }
 
       .dashboard-hero h1 {
-        max-width: 10ch;
-        color: #ffffff;
-        font-size: clamp(3rem, 7vw, 6.5rem);
-        line-height: 0.88;
-        letter-spacing: -0.065em;
-        text-transform: uppercase;
+        max-width: 18ch;
+        color: var(--text-primary);
+        font-size: clamp(2.1rem, 5vw, 3rem);
+        line-height: 1.15;
+        letter-spacing: -0.03em;
       }
 
       .dashboard-hero p {
         max-width: 640px;
-        color: rgba(255, 255, 255, 0.82);
-        font-size: 1.05rem;
-        line-height: 1.65;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.6;
       }
 
       .hero-actions {
@@ -242,10 +224,9 @@ const Home = () => (
       }
 
       .dashboard-hero .btn-secondary {
-        color: #ffffff;
-        background: rgba(10, 13, 58, 0.34);
-        border-color: rgba(255, 255, 255, 0.24);
-        backdrop-filter: blur(10px);
+        color: var(--text-primary);
+        background: var(--bg-card);
+        border-color: var(--border-strong);
       }
 
       .hero-summary {
@@ -260,23 +241,22 @@ const Home = () => (
         column-gap: 1rem;
         align-items: center;
         padding: 1rem 1.1rem;
-        color: #ffffff;
-        background: rgba(10, 13, 58, 0.35);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-primary);
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
         border-radius: var(--border-radius-lg);
-        backdrop-filter: blur(14px);
       }
 
       .summary-card span {
         grid-row: 1 / span 2;
         font-family: var(--font-display);
-        font-size: 2.1rem;
-        font-weight: 800;
-        color: var(--intent-color);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--accent-color);
       }
 
-      .summary-card strong { color: #ffffff; font-size: 1rem; }
-      .summary-card p { margin: 0; color: rgba(255, 255, 255, 0.7); font-size: 0.82rem; }
+      .summary-card strong { color: var(--text-primary); font-size: 0.95rem; }
+      .summary-card p { margin: 0; color: var(--text-secondary); font-size: 0.8rem; }
 
       .quick-actions,
       .feature-grid {
@@ -310,10 +290,10 @@ const Home = () => (
         display: grid;
         flex: 0 0 auto;
         place-items: center;
-        color: #ffffff;
-        background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
+        color: var(--accent-color);
+        background: var(--accent-light);
+        border: 1px solid var(--border-color);
         border-radius: var(--border-radius-md);
-        box-shadow: 0 10px 24px var(--accent-glow);
       }
 
       .action-card > svg { box-sizing: content-box; padding: 0.72rem; }
@@ -326,7 +306,7 @@ const Home = () => (
       .home-section { display: flex; flex-direction: column; gap: 1.25rem; }
       .section-header { display: flex; flex-direction: column; gap: 0.6rem; }
       .section-header h2,
-      .workflow-panel h2 { max-width: 16ch; font-size: clamp(2rem, 4vw, 3.6rem); text-transform: uppercase; }
+      .workflow-panel h2 { max-width: 20ch; font-size: clamp(1.5rem, 3vw, 2rem); }
 
       .feature-card {
         position: relative;
@@ -348,9 +328,7 @@ const Home = () => (
         grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
         gap: 2rem;
         padding: clamp(1.5rem, 4vw, 2.5rem);
-        background:
-          radial-gradient(circle at 100% 0%, var(--mesh-magenta), transparent 34%),
-          var(--bg-card);
+        background: var(--bg-card);
       }
 
       .step-list { display: flex; flex-direction: column; gap: 0.8rem; }
@@ -366,7 +344,7 @@ const Home = () => (
         border-radius: var(--border-radius-md);
       }
 
-      .step-row svg { flex: 0 0 auto; color: var(--accent-magenta); }
+      .step-row svg { flex: 0 0 auto; color: var(--accent-color); }
 
       @media (max-width: 1023px) {
         .dashboard-hero,
@@ -381,8 +359,8 @@ const Home = () => (
 
       @media (max-width: 639px) {
         .dashboard-home { gap: 1.25rem; }
-        .dashboard-hero { padding: 1.5rem; border-radius: 28px; }
-        .dashboard-hero h1 { font-size: clamp(2.8rem, 15vw, 4.5rem); }
+        .dashboard-hero { padding: 1.5rem; border-radius: var(--border-radius-xl); }
+        .dashboard-hero h1 { font-size: clamp(1.9rem, 10vw, 2.5rem); }
         .hero-actions { align-items: stretch; flex-direction: column; }
         .hero-actions .btn { width: 100%; }
         .hero-summary,

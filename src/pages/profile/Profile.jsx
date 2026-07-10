@@ -120,7 +120,7 @@ const Profile = () => {
   const strength = getPasswordStrength();
 
   return (
-    <div className="profile-page discord-route">
+    <div className="profile-page">
       <div className="profile-header">
         <h1>Profile & Settings</h1>
         <p className="subtitle">Manage your account information and security preferences.</p>
@@ -313,11 +313,10 @@ const Profile = () => {
         }
 
         .profile-header h1 {
-          font-size: clamp(2.8rem, 7vw, 5.8rem);
+          font-size: clamp(2rem, 4vw, 2.75rem);
           font-weight: 800;
-          line-height: 0.9;
+          line-height: 1.2;
           color: var(--text-primary);
-          text-transform: uppercase;
         }
 
         .profile-layout-grid {
@@ -360,29 +359,25 @@ const Profile = () => {
         }
 
         .tab-nav-btn.active {
-          color: #ffffff;
-          background: var(--accent-color);
-          border-color: rgba(255, 255, 255, 0.16);
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border-color: var(--border-color);
           font-weight: 700;
-          box-shadow: 0 10px 24px var(--accent-glow);
         }
 
         .tab-content-container { min-width: 0; }
 
         .tab-pane {
           padding: clamp(1.4rem, 4vw, 2.4rem);
-          background:
-            radial-gradient(circle at 100% 0%, var(--mesh-magenta), transparent 30%),
-            var(--bg-card);
+          background: var(--bg-card);
           border-radius: var(--border-radius-xl);
         }
 
         .tab-pane h2 {
-          font-size: clamp(1.8rem, 4vw, 2.7rem);
+          font-size: clamp(1.4rem, 3vw, 1.8rem);
           font-weight: 800;
           color: var(--text-primary);
           margin-bottom: 0.25rem;
-          text-transform: uppercase;
         }
 
         .pane-desc {

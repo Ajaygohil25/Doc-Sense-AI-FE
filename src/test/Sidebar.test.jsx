@@ -39,11 +39,9 @@ describe('Sidebar', () => {
     expect(screen.getByRole('button', { name: /toggle theme/i })).toHaveTextContent(/dark mode/i);
   });
 
-  it('uses Discord shell hooks while retaining theme switching', () => {
-    expect(sidebarSource).toContain('var(--accent-magenta)');
+  it('uses restrained shell hooks while retaining theme switching', () => {
     expect(sidebarSource).toContain('var(--sidebar-active-bg)');
-    expect(authCss).toContain('var(--mesh-primary)');
-    expect(authCss).toContain('var(--mesh-magenta)');
-    expect(authCss).not.toContain('var(--gradient-mint)');
+    expect(sidebarSource).not.toMatch(/linear-gradient|radial-gradient|accent-magenta|intent-color/);
+    expect(authCss).not.toMatch(/linear-gradient|radial-gradient|--mesh-|text-transform: uppercase/);
   });
 });

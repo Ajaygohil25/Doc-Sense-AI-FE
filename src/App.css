@@ -3,6 +3,7 @@
 /* ===== SHOW SIDEBAR BUTTON ===== */
 .app-container.chat-layout {
   height: 100vh;
+  height: 100dvh;
   min-height: 0;
   overflow: hidden;
 }
@@ -11,6 +12,11 @@
 .app-container.chat-layout .content-body {
   min-height: 0;
   overflow: hidden;
+}
+
+.app-container.chat-layout .main-content {
+  width: 100%;
+  padding-left: 0;
 }
 
 .app-container.chat-layout .content-body {
@@ -29,9 +35,9 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: var(--on-accent);
+  background: var(--accent-color);
+  border: 1px solid var(--accent-color);
   border-radius: var(--border-radius-md);
   cursor: pointer;
   box-shadow: var(--shadow-md);
@@ -39,9 +45,9 @@
 }
 
 .show-sidebar-btn:hover {
-  background: linear-gradient(135deg, var(--accent-hover), var(--accent-magenta));
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .show-sidebar-btn:active {
@@ -61,7 +67,6 @@
   right: 0;
   bottom: 0;
   background: rgba(7, 9, 42, 0.62);
-  backdrop-filter: blur(8px);
   z-index: 50;
   animation: fadeIn var(--transition-normal);
 }

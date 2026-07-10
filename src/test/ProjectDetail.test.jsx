@@ -74,7 +74,7 @@ describe('ProjectDetail', () => {
     expect(screen.getByText('Policy.pdf')).toBeInTheDocument();
     expect(screen.getByText('Default chat')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open project chat/i })).toBeEnabled();
-    expect(container.querySelector('.project-detail-page')).toHaveClass('discord-route');
+    expect(container.querySelector('.project-detail-page')).not.toHaveClass('discord-route');
     expect(container.querySelectorAll('.project-section').length).toBeGreaterThanOrEqual(2);
   });
 

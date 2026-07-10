@@ -511,7 +511,7 @@ const ProjectChat = () => {
     <div className="project-chat-page">
       {renderStatusNotice()}
 
-      <div className="chat-workspace discord-chat-workspace">
+      <div className="chat-workspace">
         <aside className="rooms-panel">
           <div className="rooms-panel-header">
             <div className="rooms-heading">
@@ -741,9 +741,7 @@ const ProjectChat = () => {
           flex-direction: column;
           min-height: 0;
           border-right: 1px solid var(--border-color);
-          background:
-            radial-gradient(circle at 0% 0%, var(--mesh-primary), transparent 30%),
-            var(--bg-secondary);
+          background: var(--bg-secondary);
         }
 
         .rooms-panel-header,
@@ -777,7 +775,6 @@ const ProjectChat = () => {
         .rooms-heading h3,
         .conversation-header h3 {
           font-size: 1rem;
-          text-transform: uppercase;
         }
 
         .rooms-heading span,
@@ -803,10 +800,9 @@ const ProjectChat = () => {
         }
 
         .icon-button.accent {
-          color: #ffffff;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
+          color: var(--on-accent);
+          background: var(--accent-color);
           border-color: var(--accent-color);
-          box-shadow: 0 8px 20px var(--accent-glow);
         }
 
         .project-context {
@@ -859,13 +855,12 @@ const ProjectChat = () => {
         }
 
         .room-item.active {
-          color: #ffffff;
-          background: var(--accent-color);
-          border-color: rgba(255, 255, 255, 0.18);
-          box-shadow: 0 10px 24px var(--accent-glow);
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border-color: var(--border-strong);
         }
 
-        .room-item.active .room-copy small { color: rgba(255, 255, 255, 0.72); }
+        .room-item.active .room-copy small { color: var(--text-secondary); }
 
         .room-copy {
           display: flex;
@@ -902,10 +897,7 @@ const ProjectChat = () => {
           flex-direction: column;
           min-width: 0;
           min-height: 0;
-          background:
-            radial-gradient(circle at 12% 8%, var(--mesh-primary), transparent 26rem),
-            radial-gradient(circle at 92% 88%, var(--mesh-magenta), transparent 30rem),
-            var(--bg-primary);
+          background: var(--bg-primary);
         }
 
         .conversation-header {
@@ -913,8 +905,7 @@ const ProjectChat = () => {
           padding: 0.9rem 1.25rem;
           border-bottom: 1px solid var(--border-color);
           gap: 1rem;
-          background: color-mix(in srgb, var(--bg-card) 88%, transparent);
-          backdrop-filter: blur(18px);
+          background: var(--bg-card);
         }
 
         .connection-pill {
@@ -969,13 +960,13 @@ const ProjectChat = () => {
           padding: 0.75rem 0.9rem;
           border-radius: var(--border-radius-lg);
           border: 1px solid var(--border-color);
-          background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+          background: var(--bg-card);
           box-shadow: var(--shadow-sm);
         }
 
         .row-user .message-bubble {
           color: var(--on-accent);
-          background: linear-gradient(135deg, var(--accent-color), #6f55e8);
+          background: var(--accent-color);
           border-color: var(--accent-color);
         }
 
@@ -1030,8 +1021,7 @@ const ProjectChat = () => {
           gap: 0.75rem;
           padding: 1rem 1.25rem;
           border-top: 1px solid var(--border-color);
-          background: color-mix(in srgb, var(--bg-card) 92%, transparent);
-          backdrop-filter: blur(18px);
+          background: var(--bg-card);
         }
 
         .chat-input-field {
@@ -1049,7 +1039,7 @@ const ProjectChat = () => {
         .chat-input-field:focus {
           outline: none;
           border-color: var(--accent-color);
-          box-shadow: 0 0 0 2px var(--accent-glow);
+          box-shadow: 0 0 0 3px var(--accent-light);
         }
 
         .chat-send-btn {
@@ -1082,7 +1072,6 @@ const ProjectChat = () => {
           position: fixed;
           inset: 0;
           background: rgba(7, 9, 42, 0.68);
-          backdrop-filter: blur(10px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1098,9 +1087,7 @@ const ProjectChat = () => {
           padding: 1.5rem;
           border: 1px solid var(--border-color);
           border-radius: var(--border-radius-xl);
-          background:
-            radial-gradient(circle at 100% 0%, var(--mesh-magenta), transparent 34%),
-            var(--bg-card);
+          background: var(--bg-card);
           box-shadow: var(--shadow-lg);
         }
 
@@ -1109,7 +1096,7 @@ const ProjectChat = () => {
           gap: 0.75rem;
         }
 
-        .modal-header h3 { font-size: 1.5rem; text-transform: uppercase; }
+        .modal-header h3 { font-size: 1.25rem; }
 
         @media (max-width: 767px) {
           .chat-workspace {

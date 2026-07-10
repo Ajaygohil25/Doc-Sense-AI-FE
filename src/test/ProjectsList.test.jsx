@@ -55,7 +55,7 @@ describe('ProjectsList', () => {
 
     expect(await screen.findByText('Policy KB')).toBeInTheDocument();
     expect(screen.getByText('Benefits and policies')).toBeInTheDocument();
-    expect(container.querySelector('.projects-page')).toHaveClass('discord-route');
+    expect(container.querySelector('.projects-page')).not.toHaveClass('discord-route');
     expect(container.querySelector('.project-card')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /open project/i }));

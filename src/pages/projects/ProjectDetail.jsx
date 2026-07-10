@@ -176,7 +176,7 @@ const ProjectDetail = () => {
   }
 
   return (
-    <div className="project-detail-page discord-route">
+    <div className="project-detail-page">
       <div className="project-detail-header">
         <button type="button" className="icon-button" onClick={() => navigate('/projects')} aria-label="Back to projects">
           <ArrowLeft size={18} />
@@ -241,7 +241,7 @@ const ProjectDetail = () => {
           </div>
           <button
             type="button"
-            className="btn btn-intent"
+            className="btn btn-primary"
             onClick={handleUpload}
             disabled={!selectedFile || uploading}
           >
@@ -330,9 +330,8 @@ const ProjectDetail = () => {
         }
 
         .project-title h1 {
-          font-size: clamp(2.5rem, 6vw, 4.8rem);
-          line-height: 0.92;
-          text-transform: uppercase;
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          line-height: 1.2;
         }
 
         .project-detail-header,
@@ -371,10 +370,9 @@ const ProjectDetail = () => {
         .section-icon {
           width: 52px;
           height: 52px;
-          color: #ffffff;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
-          border-color: rgba(255, 255, 255, 0.2);
-          box-shadow: 0 10px 24px var(--accent-glow);
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border-color: var(--border-color);
         }
 
         .icon-button {
@@ -393,20 +391,15 @@ const ProjectDetail = () => {
         }
 
         .project-section:nth-of-type(1) {
-          background:
-            radial-gradient(circle at 100% 0%, var(--mesh-primary), transparent 32%),
-            var(--bg-card);
+          background: var(--bg-card);
         }
 
         .project-section:nth-of-type(2) {
-          background:
-            radial-gradient(circle at 100% 0%, var(--mesh-magenta), transparent 32%),
-            var(--bg-card);
+          background: var(--bg-card);
         }
 
         .section-header h2 {
-          font-size: clamp(1.7rem, 3vw, 2.5rem);
-          text-transform: uppercase;
+          font-size: clamp(1.4rem, 3vw, 1.8rem);
         }
 
         .section-header p {
@@ -482,9 +475,8 @@ const ProjectDetail = () => {
           background-color: var(--bg-strong);
           color: var(--text-primary);
           font-size: 0.73rem;
-          font-weight: 800;
+          font-weight: 700;
           letter-spacing: 0.06em;
-          text-transform: uppercase;
         }
 
         .project-files-table tbody tr:hover { background: var(--accent-light); }
@@ -549,7 +541,7 @@ const ProjectDetail = () => {
           color: var(--text-secondary);
         }
 
-        .files-empty svg { color: var(--accent-magenta); }
+        .files-empty svg { color: var(--accent-color); }
 
         .danger-icon {
           color: var(--danger-color);

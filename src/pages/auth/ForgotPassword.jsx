@@ -139,14 +139,14 @@ const ForgotPassword = () => {
         .success-icon-badge {
           width: 64px;
           height: 64px;
-          border-radius: 20px;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
-          color: #ffffff;
+          border-radius: var(--border-radius-lg);
+          background: var(--accent-light);
+          color: var(--accent-color);
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.5rem auto;
-          box-shadow: 0 14px 32px var(--accent-glow);
+          box-shadow: var(--shadow-sm);
         }
 
         .success-state h3 {

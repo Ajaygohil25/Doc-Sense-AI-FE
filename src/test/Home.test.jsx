@@ -17,12 +17,13 @@ describe('Home', () => {
     expect(screen.getByRole('heading', { name: /single-document chat/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /project knowledge bases/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /source-grounded answers/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /upload a pdf/i })).toHaveClass('btn-intent');
+    expect(screen.getByRole('link', { name: /upload a pdf/i })).toHaveClass('btn-primary');
     expect(container.querySelector('.dashboard-home')).toBeInTheDocument();
-    expect(container.querySelector('.dashboard-hero')).toHaveClass('discord-feature-panel');
+    expect(container.querySelector('.dashboard-hero')).not.toHaveClass('discord-feature-panel');
     expect(container.querySelector('.hero-summary')).toBeInTheDocument();
     expect(container.querySelector('.product-home')).not.toBeInTheDocument();
     expect(container.querySelector('[class*="cohere"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[class*="discord"]')).not.toBeInTheDocument();
     expect(screen.queryByText(/drag & drop your pdf file here/i)).not.toBeInTheDocument();
   });
 

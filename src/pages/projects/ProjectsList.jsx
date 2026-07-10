@@ -100,7 +100,7 @@ const ProjectsList = () => {
   };
 
   return (
-    <div className="projects-page discord-route">
+    <div className="projects-page">
       <div className="projects-header">
         <div>
           <h1>Projects</h1>
@@ -111,7 +111,7 @@ const ProjectsList = () => {
             <RefreshCw size={16} className={loading ? 'spin-slow' : ''} />
             <span>Refresh</span>
           </button>
-          <button className="btn btn-intent" type="button" onClick={() => setCreateModalOpen(true)}>
+          <button className="btn btn-primary" type="button" onClick={() => setCreateModalOpen(true)}>
             <Plus size={16} />
             <span>New Project</span>
           </button>
@@ -130,7 +130,7 @@ const ProjectsList = () => {
           </div>
           <h3>No projects yet</h3>
           <p>Create a project to upload multiple PDFs into one shared knowledge base.</p>
-          <button className="btn btn-intent" type="button" onClick={() => setCreateModalOpen(true)}>
+          <button className="btn btn-primary" type="button" onClick={() => setCreateModalOpen(true)}>
             <Plus size={16} />
             <span>New Project</span>
           </button>
@@ -219,7 +219,7 @@ const ProjectsList = () => {
               </button>
               <button
                 type="submit"
-                className="btn btn-intent"
+                className="btn btn-primary"
                 disabled={creating || !projectName.trim()}
               >
                 {creating ? <Spinner size={16} color="var(--on-accent)" /> : <Plus size={16} />}
@@ -239,9 +239,8 @@ const ProjectsList = () => {
         }
 
         .projects-header h1 {
-          font-size: clamp(2.8rem, 7vw, 5.8rem);
-          line-height: 0.9;
-          text-transform: uppercase;
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          line-height: 1.2;
         }
 
         .projects-header,
@@ -274,15 +273,12 @@ const ProjectsList = () => {
           justify-content: center;
           gap: 1rem;
           text-align: center;
-          background:
-            radial-gradient(circle at 50% 0%, var(--mesh-magenta), transparent 38%),
-            var(--bg-card);
-          border-radius: var(--border-radius-xxl);
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
         }
 
         .projects-empty h3 {
-          font-size: clamp(1.8rem, 4vw, 2.7rem);
-          text-transform: uppercase;
+          font-size: clamp(1.4rem, 3vw, 1.8rem);
         }
 
         .projects-empty p {
@@ -295,16 +291,16 @@ const ProjectsList = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          color: #ffffff;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 12px 28px var(--accent-glow);
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-sm);
         }
 
         .empty-icon {
           width: 82px;
           height: 82px;
-          border-radius: 26px;
+          border-radius: var(--border-radius-lg);
         }
 
         .project-card-icon {
@@ -326,15 +322,7 @@ const ProjectsList = () => {
           gap: 1rem;
           min-height: 280px;
           padding: 1.6rem;
-          background:
-            radial-gradient(circle at 100% 0%, var(--mesh-primary), transparent 42%),
-            var(--bg-card);
-        }
-
-        .project-card:nth-child(3n + 2) {
-          background:
-            radial-gradient(circle at 100% 0%, var(--mesh-magenta), transparent 42%),
-            var(--bg-card);
+          background: var(--bg-card);
         }
 
         .project-card-copy {
@@ -366,7 +354,6 @@ const ProjectsList = () => {
           position: fixed;
           inset: 0;
           background: rgba(7, 9, 42, 0.68);
-          backdrop-filter: blur(10px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -376,9 +363,7 @@ const ProjectsList = () => {
 
         .project-modal {
           width: min(480px, 100%);
-          background:
-            radial-gradient(circle at 100% 0%, var(--mesh-magenta), transparent 32%),
-            var(--bg-card);
+          background: var(--bg-card);
           border: 1px solid var(--border-color);
           border-radius: var(--border-radius-xl);
           padding: 1.5rem;
@@ -394,7 +379,6 @@ const ProjectsList = () => {
 
         .modal-header h3 {
           font-size: 1.6rem;
-          text-transform: uppercase;
         }
 
         .icon-button {

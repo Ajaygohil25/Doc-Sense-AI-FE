@@ -142,7 +142,7 @@ const DocumentsList = () => {
             <RefreshCw size={16} className={loading ? 'spin-slow' : ''} />
             <span>Refresh</span>
           </button>
-          <Link to="/upload" className="btn btn-intent">
+          <Link to="/upload" className="btn btn-primary">
             <Upload size={16} />
             <span>Upload New</span>
           </Link>
@@ -158,7 +158,7 @@ const DocumentsList = () => {
           </div>
           <h3>No documents found</h3>
           <p>You haven't uploaded any documents yet. Upload a PDF file to begin analysis.</p>
-          <Link to="/upload" className="btn btn-intent" style={{ marginTop: '0.5rem' }}>
+          <Link to="/upload" className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
             Upload First PDF
           </Link>
         </div>
@@ -239,9 +239,8 @@ const DocumentsList = () => {
         }
 
         .documents-list-header h1 {
-          font-size: clamp(2.8rem, 7vw, 5.8rem);
-          line-height: 0.9;
-          text-transform: uppercase;
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          line-height: 1.2;
         }
 
         .header-actions { display: flex; gap: 0.75rem; }
@@ -255,10 +254,8 @@ const DocumentsList = () => {
           gap: 0.85rem;
           padding: 4rem 2rem;
           text-align: center;
-          background:
-            radial-gradient(circle at 50% 0%, var(--mesh-magenta), transparent 38%),
-            var(--bg-card);
-          border-radius: var(--border-radius-xxl);
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
         }
 
         .empty-icon-badge {
@@ -267,13 +264,14 @@ const DocumentsList = () => {
           height: 90px;
           margin-bottom: 0.5rem;
           place-items: center;
-          color: #ffffff;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
-          border-radius: 28px;
-          box-shadow: 0 18px 42px var(--accent-glow);
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-lg);
+          box-shadow: var(--shadow-sm);
         }
 
-        .empty-state h3 { font-size: clamp(1.8rem, 4vw, 2.7rem); font-weight: 800; text-transform: uppercase; }
+        .empty-state h3 { font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 700; }
         .empty-state p { max-width: 430px; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.65; }
 
         .table-container {
@@ -300,9 +298,8 @@ const DocumentsList = () => {
           background: var(--bg-strong);
           border-bottom: 1px solid var(--border-color);
           font-size: 0.73rem;
-          font-weight: 800;
+          font-weight: 700;
           letter-spacing: 0.07em;
-          text-transform: uppercase;
         }
 
         .documents-table td { color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
@@ -312,7 +309,7 @@ const DocumentsList = () => {
 
         .doc-name-cell { display: flex; align-items: center; gap: 0.75rem; max-width: 320px; font-weight: 700; }
         .doc-name-cell span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .doc-icon { flex: 0 0 auto; color: var(--accent-magenta); }
+        .doc-icon { flex: 0 0 auto; color: var(--accent-color); }
 
         .badge {
           display: inline-flex;
