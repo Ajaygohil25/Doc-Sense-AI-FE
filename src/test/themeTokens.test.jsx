@@ -6,6 +6,10 @@ import { describe, expect, it } from 'vitest';
 const css = fs.readFileSync(path.join(cwd(), 'src/index.css'), 'utf8');
 const rootBlock = css.match(/:root\s*\{(?<body>[\s\S]*?)\n\}/)?.groups?.body ?? '';
 const darkBlock = css.match(/\.dark\s*\{(?<body>[\s\S]*?)\n\}/)?.groups?.body ?? '';
+const authPages = ['Login', 'Register', 'ForgotPassword', 'ResetPassword'].map((name) => ({
+  name,
+  source: fs.readFileSync(path.join(cwd(), `src/pages/auth/${name}.jsx`), 'utf8'),
+}));
 
 describe('Discord-inspired theme contract', () => {
   it('uses the approved open-source typography and removes the editorial serif', () => {
@@ -39,5 +43,11 @@ describe('Discord-inspired theme contract', () => {
     expect(css).not.toContain('#0c0a09');
     expect(css).not.toContain('--gradient-mint');
     expect(css).not.toContain('--gradient-peach');
+  });
+
+  it('loads the shared auth shell styles on every public auth route', () => {
+    authPages.forEach(({ name, source }) => {
+      expect(source, `${name} must load auth.css`).toContain("import './auth.css';");
+    });
   });
 });

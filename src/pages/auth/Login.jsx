@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { Spinner } from '../../components/ui/Loader';
 import { BrainCircuit, Mail, Lock } from 'lucide-react';
+import './auth.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -95,7 +96,7 @@ const Login = () => {
           </div>
 
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? <Spinner size={18} color="#fff" /> : 'Sign In'}
+            {loading ? <Spinner size={18} color="var(--on-accent)" /> : 'Sign In'}
           </button>
 
           <p className="auth-footer-text">
@@ -104,208 +105,6 @@ const Login = () => {
         </form>
       </div>
 
-      <style>{`
-        .auth-page {
-          display: flex;
-          min-height: 100vh;
-          width: 100%;
-        }
-
-        .auth-brand-pane {
-          flex: 1.2;
-          background-color: var(--bg-sidebar);
-          color: #ffffff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 3rem;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .auth-brand-pane::before {
-          content: '';
-          position: absolute;
-          width: 300px;
-          height: 300px;
-          background-color: var(--accent-color);
-          filter: blur(150px);
-          opacity: 0.15;
-          top: -50px;
-          left: -50px;
-          border-radius: 50%;
-        }
-
-        .auth-brand-pane::after {
-          content: '';
-          position: absolute;
-          width: 400px;
-          height: 400px;
-          background-color: var(--accent-color);
-          filter: blur(200px);
-          opacity: 0.1;
-          bottom: -100px;
-          right: -100px;
-          border-radius: 50%;
-        }
-
-        .pane-content {
-          max-width: 460px;
-          position: relative;
-          z-index: 10;
-          text-align: left;
-        }
-
-        .brand-logo {
-          color: var(--accent-color);
-          margin-bottom: 1.5rem;
-          display: inline-block;
-          animation: float 4s ease-in-out infinite;
-        }
-
-        @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-          100% { transform: translateY(0px); }
-        }
-
-        .auth-brand-pane h1 {
-          font-size: 2.75rem;
-          color: #ffffff;
-          margin-bottom: 0.5rem;
-          font-family: var(--font-display);
-          font-weight: 700;
-        }
-
-        .tagline {
-          font-size: 1.5rem;
-          color: var(--accent-color);
-          margin-bottom: 1.5rem;
-          font-weight: 500;
-        }
-
-        .description {
-          font-size: 1rem;
-          line-height: 1.6;
-          color: var(--sidebar-text-muted);
-        }
-
-        .auth-form-pane {
-          flex: 1;
-          background-color: var(--bg-secondary);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 2.5rem;
-          transition: background-color var(--transition-normal);
-        }
-
-        .auth-form {
-          width: 100%;
-          max-width: 400px;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .form-header {
-          margin-bottom: 2rem;
-          text-align: left;
-        }
-
-        .form-header h2 {
-          font-size: 1.875rem;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 0.375rem;
-        }
-
-        .form-header p {
-          font-size: 0.875rem;
-          color: var(--text-muted);
-        }
-
-        .input-container {
-          position: relative;
-          width: 100%;
-        }
-
-        .input-icon {
-          position: absolute;
-          left: 0.875rem;
-          top: 50%;
-          transform: translateY(-50%);
-          color: var(--text-muted);
-          transition: color var(--transition-fast);
-        }
-
-        .form-input.with-icon {
-          padding-left: 2.625rem;
-        }
-
-        .form-input.with-icon:focus + .input-icon {
-          color: var(--accent-color);
-        }
-
-        .password-label-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 0.5rem;
-        }
-
-        .password-label-row .form-label {
-          margin-bottom: 0;
-        }
-
-        .forgot-link {
-          font-size: 0.8125rem;
-          color: var(--accent-color);
-          text-decoration: none;
-          font-weight: 500;
-          transition: color var(--transition-fast);
-        }
-
-        .forgot-link:hover {
-          color: var(--accent-hover);
-        }
-
-        .btn-block {
-          width: 100%;
-          margin-top: 0.5rem;
-          height: 42px;
-        }
-
-        .auth-footer-text {
-          margin-top: 1.5rem;
-          font-size: 0.875rem;
-          color: var(--text-secondary);
-          text-align: center;
-        }
-
-        .auth-link {
-          color: var(--accent-color);
-          text-decoration: none;
-          font-weight: 600;
-          transition: color var(--transition-fast);
-        }
-
-        .auth-link:hover {
-          color: var(--accent-hover);
-        }
-
-        @media (max-width: 900px) {
-          .auth-page {
-            flex-direction: column;
-          }
-          .auth-brand-pane {
-            flex: none;
-            padding: 3rem 1.5rem;
-          }
-          .auth-form-pane {
-            padding: 3rem 1.5rem;
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import { Spinner } from '../../components/ui/Loader';
 import { BrainCircuit, Mail, ArrowLeft } from 'lucide-react';
+import './auth.css';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -138,13 +139,14 @@ const ForgotPassword = () => {
         .success-icon-badge {
           width: 64px;
           height: 64px;
-          border-radius: 50%;
-          background-color: var(--bg-strong);
-          color: var(--accent-color);
+          border-radius: 20px;
+          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
+          color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.5rem auto;
+          box-shadow: 0 14px 32px var(--accent-glow);
         }
 
         .success-state h3 {
@@ -163,9 +165,9 @@ const ForgotPassword = () => {
           margin-top: 1rem;
           font-size: 0.8rem !important;
           color: var(--text-muted) !important;
-          background-color: var(--bg-primary);
+          background-color: var(--bg-elevated);
           padding: 0.75rem;
-          border-radius: var(--border-radius-xl);
+          border-radius: var(--border-radius-lg);
           border: 1px dashed var(--border-color);
         }
       `}</style>
