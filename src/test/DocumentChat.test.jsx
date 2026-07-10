@@ -113,11 +113,14 @@ describe('DocumentChat', () => {
   });
 
   it('loads rooms, auto-selects the latest room, and renders history', async () => {
-    renderDocumentChat();
+    const { container } = renderDocumentChat();
 
     expect((await screen.findAllByText('Latest room')).length).toBeGreaterThan(0);
     expect(screen.getByText('Stored answer')).toBeInTheDocument();
     expect(api.get).toHaveBeenCalledWith('/chat/get-chat-messages-by-room-id/room-latest');
+    expect(container.querySelector('.chat-workspace')).toHaveClass('discord-chat-workspace');
+    expect(container.querySelector('.rooms-panel')).toBeInTheDocument();
+    expect(container.querySelector('.conversation-panel')).toBeInTheDocument();
   });
 
   it('creates a named chat room and selects it', async () => {

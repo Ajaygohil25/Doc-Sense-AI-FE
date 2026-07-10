@@ -510,7 +510,7 @@ const DocumentChat = () => {
     <div className="document-chat-page">
       {renderStatusNotice()}
 
-      <div className="chat-workspace">
+      <div className="chat-workspace discord-chat-workspace">
         <aside className="rooms-panel">
           <div className="rooms-panel-header">
             <div className="rooms-heading">
@@ -647,7 +647,7 @@ const DocumentChat = () => {
               disabled={!canSend || !inputText.trim()}
               title={isSending ? 'Waiting for response' : 'Send message'}
             >
-              {isSending ? <Spinner size={16} color="#fff" /> : <Send size={16} />}
+              {isSending ? <Spinner size={16} color="var(--on-accent)" /> : <Send size={16} />}
             </button>
           </form>
         </section>
@@ -693,7 +693,7 @@ const DocumentChat = () => {
                 className="btn btn-primary"
                 disabled={creatingRoom || !newRoomName.trim()}
               >
-                {creatingRoom ? <Spinner size={16} color="#fff" /> : <Plus size={16} />}
+                {creatingRoom ? <Spinner size={16} color="var(--on-accent)" /> : <Plus size={16} />}
                 <span>Create</span>
               </button>
             </div>
@@ -707,7 +707,7 @@ const DocumentChat = () => {
           flex-direction: column;
           height: 100%;
           min-height: 0;
-          background-color: var(--bg-card);
+          background-color: var(--bg-primary);
           border: 0;
           border-radius: 0;
           overflow: hidden;
@@ -727,9 +727,11 @@ const DocumentChat = () => {
         }
 
         .chat-error-screen {
-          background-color: var(--bg-card);
+          background:
+            radial-gradient(circle at 50% 0%, var(--mesh-magenta), transparent 40%),
+            var(--bg-card);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-xl);
         }
 
         .error-icon {
@@ -740,21 +742,23 @@ const DocumentChat = () => {
           display: flex;
           align-items: center;
           gap: 1rem;
-          padding: 1rem 1.25rem;
+          min-height: 72px;
+          padding: 0.9rem 1.25rem;
           border-bottom: 1px solid var(--border-color);
-          background-color: var(--bg-secondary);
+          background: var(--bg-sidebar);
+          backdrop-filter: blur(18px);
         }
 
         .icon-button {
-          width: 34px;
-          height: 34px;
+          width: 44px;
+          height: 44px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-sm);
           color: var(--text-secondary);
-          background-color: var(--bg-card);
+          background-color: var(--bg-elevated);
           cursor: pointer;
           transition: all var(--transition-fast);
           flex-shrink: 0;
@@ -763,14 +767,15 @@ const DocumentChat = () => {
 
         .icon-button:hover {
           color: var(--text-primary);
-          border-color: var(--text-muted);
-          background-color: var(--bg-primary);
+          border-color: var(--accent-color);
+          background-color: var(--accent-light);
         }
 
         .icon-button.accent {
-          color: var(--accent-color);
+          color: #ffffff;
           border-color: var(--accent-color);
-          background-color: var(--accent-light);
+          background: linear-gradient(135deg, var(--accent-color), var(--accent-magenta));
+          box-shadow: 0 8px 20px var(--accent-glow);
         }
 
         .chat-title-info {
@@ -781,7 +786,7 @@ const DocumentChat = () => {
         }
 
         .file-icon {
-          color: var(--accent-color);
+          color: var(--accent-magenta);
           flex-shrink: 0;
         }
 
@@ -791,7 +796,8 @@ const DocumentChat = () => {
         }
 
         .title-details h2 {
-          font-size: 1.05rem;
+          font-size: 1.12rem;
+          text-transform: uppercase;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -811,7 +817,7 @@ const DocumentChat = () => {
           align-items: center;
           gap: 0.35rem;
           padding: 0.175rem 0.5rem;
-          border-radius: 999px;
+          border-radius: var(--border-radius-pill);
           font-size: 0.72rem;
           font-weight: 700;
         }
@@ -838,7 +844,7 @@ const DocumentChat = () => {
           gap: 0.5rem;
           padding: 0.625rem 1.25rem;
           font-size: 0.84rem;
-          font-weight: 600;
+          font-weight: 700;
           border-bottom: 1px solid var(--border-color);
           text-align: left;
         }
@@ -855,7 +861,7 @@ const DocumentChat = () => {
 
         .chat-workspace {
           display: grid;
-          grid-template-columns: 292px minmax(0, 1fr);
+          grid-template-columns: 280px minmax(0, 1fr);
           min-height: 0;
           flex: 1;
         }
@@ -865,7 +871,9 @@ const DocumentChat = () => {
           flex-direction: column;
           min-height: 0;
           border-right: 1px solid var(--border-color);
-          background-color: var(--bg-secondary);
+          background:
+            radial-gradient(circle at 0% 0%, var(--mesh-primary), transparent 30%),
+            var(--bg-secondary);
         }
 
         .rooms-panel-header {
@@ -873,7 +881,8 @@ const DocumentChat = () => {
           align-items: center;
           justify-content: space-between;
           gap: 0.75rem;
-          padding: 1rem;
+          min-height: 70px;
+          padding: 0.85rem;
           border-bottom: 1px solid var(--border-color);
         }
 
@@ -886,7 +895,8 @@ const DocumentChat = () => {
 
         .rooms-panel-header h3,
         .conversation-header h3 {
-          font-size: 0.98rem;
+          font-size: 1rem;
+          text-transform: uppercase;
           margin-bottom: 0.1rem;
         }
 
@@ -899,7 +909,7 @@ const DocumentChat = () => {
         .document-context {
           padding: 0.75rem 1rem;
           border-bottom: 1px solid var(--border-color);
-          background-color: var(--bg-card);
+          background-color: var(--sidebar-user-bg);
         }
 
         .document-context strong {
@@ -926,9 +936,10 @@ const DocumentChat = () => {
           display: flex;
           align-items: center;
           gap: 0.65rem;
+          min-height: 52px;
           padding: 0.72rem;
           border: 1px solid transparent;
-          border-radius: 8px;
+          border-radius: var(--border-radius-md);
           background-color: transparent;
           color: var(--text-secondary);
           cursor: pointer;
@@ -937,14 +948,16 @@ const DocumentChat = () => {
         }
 
         .room-item:hover {
-          background-color: var(--bg-primary);
+          color: var(--text-primary);
+          background-color: var(--sidebar-hover-bg);
           border-color: var(--border-color);
         }
 
         .room-item.active {
-          color: var(--accent-color);
-          background-color: var(--accent-light);
-          border-color: var(--accent-color);
+          color: #ffffff;
+          background: var(--accent-color);
+          border-color: rgba(255, 255, 255, 0.18);
+          box-shadow: 0 10px 24px var(--accent-glow);
         }
 
         .room-copy {
@@ -968,6 +981,8 @@ const DocumentChat = () => {
           margin-top: 0.15rem;
         }
 
+        .room-item.active .room-copy small { color: rgba(255, 255, 255, 0.72); }
+
         .rooms-empty,
         .conversation-empty,
         .messages-loading {
@@ -986,7 +1001,10 @@ const DocumentChat = () => {
           min-height: 0;
           display: flex;
           flex-direction: column;
-          background-color: var(--bg-primary);
+          background:
+            radial-gradient(circle at 14% 8%, var(--mesh-primary), transparent 26rem),
+            radial-gradient(circle at 90% 86%, var(--mesh-magenta), transparent 30rem),
+            var(--bg-primary);
         }
 
         .conversation-header {
@@ -994,9 +1012,11 @@ const DocumentChat = () => {
           align-items: center;
           justify-content: space-between;
           gap: 1rem;
-          padding: 1rem 1.25rem;
+          min-height: 70px;
+          padding: 0.9rem 1.25rem;
           border-bottom: 1px solid var(--border-color);
-          background-color: var(--bg-card);
+          background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+          backdrop-filter: blur(18px);
           flex-shrink: 0;
         }
 
@@ -1011,7 +1031,7 @@ const DocumentChat = () => {
           flex: 1;
           min-height: 0;
           overflow-y: auto;
-          padding: 1.25rem;
+          padding: clamp(1rem, 3vw, 1.75rem);
           overscroll-behavior: contain;
         }
 
@@ -1042,27 +1062,27 @@ const DocumentChat = () => {
         .message-bubble {
           max-width: min(76%, 720px);
           padding: 0.78rem 0.95rem;
-          border-radius: 8px;
+          border-radius: var(--border-radius-lg);
           box-shadow: var(--shadow-sm);
           text-align: left;
         }
 
         .row-assistant .message-bubble {
-          background-color: var(--bg-card);
+          background: color-mix(in srgb, var(--bg-card) 92%, transparent);
           color: var(--text-primary);
           border: 1px solid var(--border-color);
         }
 
         .row-user .message-bubble {
-          background-color: var(--accent-color);
-          color: white;
+          background: linear-gradient(135deg, var(--accent-color), #6f55e8);
+          color: var(--on-accent);
         }
 
         .row-system .message-bubble {
           max-width: min(82%, 640px);
           background-color: var(--danger-light);
           color: var(--danger-color);
-          border: 1px dashed rgba(239, 68, 68, 0.35);
+          border: 1px dashed var(--danger-color);
         }
 
         .message-bubble.streaming {
@@ -1070,7 +1090,7 @@ const DocumentChat = () => {
         }
 
         .message-text {
-          font-size: 0.92rem;
+          font-size: 0.94rem;
           line-height: 1.55;
           white-space: pre-wrap;
           word-break: break-word;
@@ -1113,9 +1133,10 @@ const DocumentChat = () => {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding: 0.95rem 1.25rem;
+          padding: 1rem 1.25rem;
           border-top: 1px solid var(--border-color);
-          background-color: var(--bg-card);
+          background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+          backdrop-filter: blur(18px);
           flex-shrink: 0;
         }
 
@@ -1123,11 +1144,12 @@ const DocumentChat = () => {
           flex: 1;
           min-width: 0;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          min-height: 48px;
+          border-radius: var(--border-radius-md);
           padding: 0.75rem 1rem;
           font-family: var(--font-sans);
           font-size: 0.92rem;
-          background-color: var(--bg-primary);
+          background-color: var(--bg-elevated);
           color: var(--text-primary);
           outline: none;
           transition: all var(--transition-fast);
@@ -1135,7 +1157,7 @@ const DocumentChat = () => {
 
         .chat-input-field:focus {
           border-color: var(--accent-color);
-          box-shadow: 0 0 0 3px var(--accent-glow);
+          box-shadow: 0 0 0 2px var(--accent-glow);
         }
 
         .chat-input-field:disabled {
@@ -1144,10 +1166,10 @@ const DocumentChat = () => {
         }
 
         .chat-send-btn {
-          width: 42px;
-          height: 42px;
+          width: 48px;
+          height: 48px;
           padding: 0;
-          border-radius: 8px;
+          border-radius: var(--border-radius-pill);
           flex-shrink: 0;
         }
 
@@ -1159,16 +1181,19 @@ const DocumentChat = () => {
           align-items: center;
           justify-content: center;
           padding: 1rem;
-          background-color: rgba(0, 0, 0, 0.48);
+          background-color: rgba(7, 9, 42, 0.68);
+          backdrop-filter: blur(10px);
         }
 
         .create-room-modal {
           width: min(420px, 100%);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          background-color: var(--bg-card);
+          border-radius: var(--border-radius-xl);
+          background:
+            radial-gradient(circle at 100% 0%, var(--mesh-magenta), transparent 34%),
+            var(--bg-card);
           box-shadow: var(--shadow-lg);
-          padding: 1.25rem;
+          padding: 1.5rem;
         }
 
         .modal-header {
@@ -1180,7 +1205,8 @@ const DocumentChat = () => {
         }
 
         .modal-header h3 {
-          font-size: 1.08rem;
+          font-size: 1.5rem;
+          text-transform: uppercase;
         }
 
         .modal-actions {
@@ -1190,7 +1216,7 @@ const DocumentChat = () => {
           margin-top: 1.25rem;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 767px) {
           .document-chat-page {
             height: 100%;
             min-height: 0;
@@ -1202,8 +1228,8 @@ const DocumentChat = () => {
           }
 
           .rooms-panel {
-            max-height: 230px;
-            min-height: 170px;
+            max-height: 210px;
+            min-height: 150px;
             border-right: none;
             border-bottom: 1px solid var(--border-color);
           }
@@ -1215,7 +1241,7 @@ const DocumentChat = () => {
           }
 
           .room-item {
-            min-width: 220px;
+            min-width: 210px;
           }
 
           .chat-messages-container {

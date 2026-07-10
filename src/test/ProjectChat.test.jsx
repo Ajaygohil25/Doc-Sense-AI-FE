@@ -127,11 +127,14 @@ describe('ProjectChat', () => {
   });
 
   it('loads project chat rooms and renders project-scoped history', async () => {
-    renderProjectChat();
+    const { container } = renderProjectChat();
 
     expect(await screen.findByText('Policy KB')).toBeInTheDocument();
     expect(screen.getByText('Stored project answer')).toBeInTheDocument();
     expect(getProjectChatMessages).toHaveBeenCalledWith('project-1', 'room-1');
+    expect(container.querySelector('.chat-workspace')).toHaveClass('discord-chat-workspace');
+    expect(container.querySelector('.rooms-panel')).toBeInTheDocument();
+    expect(container.querySelector('.conversation-panel')).toBeInTheDocument();
   });
 
   it('creates a named project chat room and selects it', async () => {
