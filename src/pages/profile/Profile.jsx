@@ -55,9 +55,9 @@ const Profile = () => {
   const getPasswordStrength = () => {
     const passed = Object.values(checks).filter(Boolean).length;
     if (passed === 0) return { label: 'Empty', color: 'var(--border-color)', percent: 0 };
-    if (passed <= 2) return { label: 'Weak', color: '#ef4444', percent: 33 };
-    if (passed <= 4) return { label: 'Fair', color: '#fbbf24', percent: 66 };
-    return { label: 'Strong', color: '#10b981', percent: 100 };
+    if (passed <= 2) return { label: 'Weak', color: 'var(--danger-color)', percent: 33 };
+    if (passed <= 4) return { label: 'Fair', color: 'var(--warning-color)', percent: 66 };
+    return { label: 'Strong', color: 'var(--success-color)', percent: 100 };
   };
 
   const isPasswordValid = Object.values(checks).every(Boolean);
@@ -197,7 +197,7 @@ const Profile = () => {
 
                 <div className="form-actions">
                   <button type="submit" className="btn btn-primary" disabled={profileLoading}>
-                    {profileLoading ? <Spinner size={16} color="#fff" /> : 'Save Changes'}
+                    {profileLoading ? <Spinner size={16} color="var(--on-accent)" /> : 'Save Changes'}
                   </button>
                 </div>
               </form>
@@ -295,7 +295,7 @@ const Profile = () => {
                     className="btn btn-primary" 
                     disabled={securityLoading || (newPassword && !isPasswordValid)}
                   >
-                    {securityLoading ? <Spinner size={16} color="#fff" /> : 'Update Password'}
+                    {securityLoading ? <Spinner size={16} color="var(--on-accent)" /> : 'Update Password'}
                   </button>
                 </div>
               </form>
@@ -313,19 +313,22 @@ const Profile = () => {
         }
 
         .profile-header h1 {
-          font-size: 2rem;
-          font-weight: 700;
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          font-weight: 800;
+          line-height: 1.2;
           color: var(--text-primary);
         }
 
         .profile-layout-grid {
           display: grid;
           grid-template-columns: 240px 1fr;
-          gap: 2rem;
+          gap: 1.25rem;
           align-items: flex-start;
         }
 
         .tabs-navigation {
+          position: sticky;
+          top: 1.5rem;
           padding: 0.75rem;
           display: flex;
           flex-direction: column;
@@ -337,12 +340,13 @@ const Profile = () => {
           align-items: center;
           gap: 0.75rem;
           padding: 0.75rem 1rem;
-          border: none;
+          min-height: 48px;
+          border: 1px solid transparent;
           background: transparent;
           color: var(--text-secondary);
           border-radius: var(--border-radius-md);
           font-size: 0.9rem;
-          font-weight: 500;
+          font-weight: 700;
           cursor: pointer;
           transition: all var(--transition-fast);
           text-align: left;
@@ -350,18 +354,28 @@ const Profile = () => {
 
         .tab-nav-btn:hover {
           color: var(--text-primary);
-          background-color: var(--bg-primary);
+          background-color: var(--accent-light);
+          border-color: var(--border-color);
         }
 
         .tab-nav-btn.active {
           color: var(--accent-color);
-          background-color: var(--accent-light);
-          font-weight: 600;
+          background: var(--accent-light);
+          border-color: var(--border-color);
+          font-weight: 700;
+        }
+
+        .tab-content-container { min-width: 0; }
+
+        .tab-pane {
+          padding: clamp(1.4rem, 4vw, 2.4rem);
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
         }
 
         .tab-pane h2 {
-          font-size: 1.35rem;
-          font-weight: 600;
+          font-size: clamp(1.4rem, 3vw, 1.8rem);
+          font-weight: 800;
           color: var(--text-primary);
           margin-bottom: 0.25rem;
         }
@@ -373,7 +387,7 @@ const Profile = () => {
         }
 
         .read-only-input {
-          background-color: var(--bg-primary);
+          background-color: var(--bg-strong);
           border-color: var(--border-color);
           color: var(--text-muted);
           cursor: not-allowed;
@@ -393,9 +407,9 @@ const Profile = () => {
         }
 
         .password-strength-container {
-          background-color: var(--bg-primary);
-          padding: 0.75rem 1rem;
-          border-radius: var(--border-radius-md);
+          background-color: var(--bg-elevated);
+          padding: 1rem;
+          border-radius: var(--border-radius-lg);
           border: 1px solid var(--border-color);
         }
 
@@ -406,15 +420,16 @@ const Profile = () => {
         }
 
         .strength-bar-bg {
-          height: 4px;
-          background-color: var(--border-color);
-          border-radius: 2px;
+          height: 8px;
+          background-color: var(--bg-strong);
+          border-radius: var(--border-radius-pill);
           overflow: hidden;
           margin-bottom: 0.75rem;
         }
 
         .strength-bar-fill {
           height: 100%;
+          border-radius: inherit;
           transition: width var(--transition-fast) ease, background-color var(--transition-fast) ease;
         }
 
@@ -442,6 +457,7 @@ const Profile = () => {
           }
           
           .tabs-navigation {
+            position: static;
             flex-direction: row;
           }
           
@@ -449,6 +465,8 @@ const Profile = () => {
             flex: 1;
             justify-content: center;
           }
+
+          .form-actions .btn { width: 100%; }
         }
       `}</style>
     </div>

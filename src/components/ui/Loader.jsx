@@ -40,15 +40,16 @@ export const SkeletonTable = ({ rows = 5 }) => {
         .skeleton-table {
           width: 100%;
           border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-lg);
-          background-color: var(--bg-card);
+          overflow: hidden;
           padding: 1rem;
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
+          box-shadow: var(--shadow-sm);
         }
         
         .skeleton-header-row {
           height: 40px;
-          background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-primary) 50%, var(--border-color) 75%);
-          background-size: 200% 100%;
+          background: var(--bg-strong);
           animation: loading-pulse 1.5s infinite;
           border-radius: var(--border-radius-sm);
           margin-bottom: 1rem;
@@ -68,10 +69,9 @@ export const SkeletonTable = ({ rows = 5 }) => {
         
         .skeleton-cell {
           height: 16px;
-          background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-primary) 50%, var(--border-color) 75%);
-          background-size: 200% 100%;
+          background: var(--bg-strong);
           animation: loading-pulse 1.5s infinite;
-          border-radius: 4px;
+          border-radius: var(--border-radius-pill);
         }
         
         .cell-long { flex: 4; }
@@ -80,8 +80,8 @@ export const SkeletonTable = ({ rows = 5 }) => {
         .cell-icon { width: 32px; border-radius: 50%; }
         
         @keyframes loading-pulse {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
+          0%, 100% { opacity: 0.55; }
+          50% { opacity: 1; }
         }
       `}</style>
     </div>
@@ -106,21 +106,20 @@ export const SkeletonChat = () => {
         .skeleton-bubble {
           max-width: 60%;
           height: 60px;
-          border-radius: 12px;
-          background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-primary) 50%, var(--border-color) 75%);
-          background-size: 200% 100%;
+          border-radius: var(--border-radius-xl);
+          background: var(--bg-strong);
           animation: loading-pulse 1.5s infinite;
         }
         
         .skeleton-bubble.left {
           align-self: flex-start;
-          border-bottom-left-radius: 2px;
+          border-bottom-left-radius: var(--border-radius-sm);
           width: 50%;
         }
         
         .skeleton-bubble.right {
           align-self: flex-end;
-          border-bottom-right-radius: 2px;
+          border-bottom-right-radius: var(--border-radius-sm);
           width: 40%;
         }
       `}</style>

@@ -4,6 +4,7 @@ import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import { Spinner } from '../../components/ui/Loader';
 import { BrainCircuit, Lock, Check, X, ArrowLeft } from 'lucide-react';
+import './auth.css';
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -36,9 +37,9 @@ const ResetPassword = () => {
   const getPasswordStrength = () => {
     const passed = Object.values(checks).filter(Boolean).length;
     if (passed === 0) return { label: 'Empty', color: 'var(--border-color)', percent: 0 };
-    if (passed <= 2) return { label: 'Weak', color: '#ef4444', percent: 33 };
-    if (passed <= 4) return { label: 'Fair', color: '#fbbf24', percent: 66 };
-    return { label: 'Strong', color: '#10b981', percent: 100 };
+    if (passed <= 2) return { label: 'Weak', color: 'var(--danger-color)', percent: 33 };
+    if (passed <= 4) return { label: 'Fair', color: 'var(--warning-color)', percent: 66 };
+    return { label: 'Strong', color: 'var(--success-color)', percent: 100 };
   };
 
   const isPasswordValid = Object.values(checks).every(Boolean);
@@ -200,7 +201,7 @@ const ResetPassword = () => {
             </div>
 
             <button type="submit" className="btn btn-primary btn-block" disabled={loading || !token || (password && !isPasswordValid)}>
-              {loading ? <Spinner size={18} color="#fff" /> : 'Update Password'}
+              {loading ? <Spinner size={18} color="var(--on-accent)" /> : 'Update Password'}
             </button>
           </form>
         </div>
@@ -214,8 +215,8 @@ const ResetPassword = () => {
           background-color: var(--danger-light);
           color: var(--danger-color);
           padding: 0.75rem 1rem;
-          border-radius: var(--border-radius-md);
-          border: 1px solid rgba(239, 68, 68, 0.15);
+          border-radius: var(--border-radius-xl);
+          border: 1px solid var(--danger-color);
           font-size: 0.8125rem;
           font-weight: 500;
           margin-bottom: 1.25rem;
@@ -223,9 +224,9 @@ const ResetPassword = () => {
         }
 
         .password-strength-container {
-          background-color: var(--bg-primary);
-          padding: 0.75rem 1rem;
-          border-radius: var(--border-radius-md);
+          background-color: var(--bg-elevated);
+          padding: 1rem;
+          border-radius: var(--border-radius-lg);
           border: 1px solid var(--border-color);
           text-align: left;
         }
@@ -237,15 +238,16 @@ const ResetPassword = () => {
         }
 
         .strength-bar-bg {
-          height: 4px;
-          background-color: var(--border-color);
-          border-radius: 2px;
+          height: 8px;
+          background-color: var(--bg-strong);
+          border-radius: var(--border-radius-pill);
           overflow: hidden;
           margin-bottom: 0.75rem;
         }
 
         .strength-bar-fill {
           height: 100%;
+          border-radius: inherit;
           transition: width var(--transition-fast) ease, background-color var(--transition-fast) ease;
         }
 

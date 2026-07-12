@@ -245,7 +245,7 @@ const ProjectDetail = () => {
             onClick={handleUpload}
             disabled={!selectedFile || uploading}
           >
-            {uploading ? <Spinner size={16} color="#fff" /> : <Upload size={16} />}
+            {uploading ? <Spinner size={16} color="var(--on-accent)" /> : <Upload size={16} />}
             <span>Upload PDF</span>
           </button>
         </div>
@@ -329,6 +329,11 @@ const ProjectDetail = () => {
           text-align: left;
         }
 
+        .project-title h1 {
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          line-height: 1.2;
+        }
+
         .project-detail-header,
         .project-title,
         .section-header,
@@ -359,21 +364,22 @@ const ProjectDetail = () => {
           align-items: center;
           justify-content: center;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-md);
         }
 
         .section-icon {
-          width: 46px;
-          height: 46px;
+          width: 52px;
+          height: 52px;
           color: var(--accent-color);
-          background-color: var(--accent-light);
+          background: var(--accent-light);
+          border-color: var(--border-color);
         }
 
         .icon-button {
-          width: 38px;
-          height: 38px;
+          width: 44px;
+          height: 44px;
           color: var(--text-secondary);
-          background-color: var(--bg-card);
+          background-color: var(--bg-elevated);
           cursor: pointer;
         }
 
@@ -381,6 +387,19 @@ const ProjectDetail = () => {
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
+          padding: clamp(1.25rem, 3vw, 2rem);
+        }
+
+        .project-section:nth-of-type(1) {
+          background: var(--bg-card);
+        }
+
+        .project-section:nth-of-type(2) {
+          background: var(--bg-card);
+        }
+
+        .section-header h2 {
+          font-size: clamp(1.4rem, 3vw, 1.8rem);
         }
 
         .section-header p {
@@ -391,14 +410,28 @@ const ProjectDetail = () => {
         .upload-panel {
           gap: 0.75rem;
           padding: 1rem;
-          background-color: var(--bg-primary);
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
+          background-color: var(--bg-elevated);
+          border: 1px dashed var(--border-strong);
+          border-radius: var(--border-radius-lg);
           flex-wrap: wrap;
         }
 
         .upload-panel input[type="file"] {
           max-width: 260px;
+          color: var(--text-secondary);
+          font-size: 0.82rem;
+        }
+
+        .upload-panel input[type="file"]::file-selector-button {
+          min-height: 38px;
+          margin-right: 0.75rem;
+          padding: 0.5rem 0.75rem;
+          color: var(--on-accent);
+          background: var(--accent-color);
+          border: 0;
+          border-radius: var(--border-radius-sm);
+          font-weight: 700;
+          cursor: pointer;
         }
 
         .selected-file {
@@ -421,11 +454,12 @@ const ProjectDetail = () => {
         .table-container {
           overflow-x: auto;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-lg);
         }
 
         .project-files-table {
           width: 100%;
+          min-width: 680px;
           border-collapse: collapse;
         }
 
@@ -438,10 +472,14 @@ const ProjectDetail = () => {
         }
 
         .project-files-table th {
-          background-color: var(--bg-primary);
-          color: var(--text-secondary);
-          font-weight: 600;
+          background-color: var(--bg-strong);
+          color: var(--text-primary);
+          font-size: 0.73rem;
+          font-weight: 700;
+          letter-spacing: 0.06em;
         }
+
+        .project-files-table tbody tr:hover { background: var(--accent-light); }
 
         .project-files-table tr:last-child td {
           border-bottom: 0;
@@ -450,14 +488,14 @@ const ProjectDetail = () => {
         .file-name-cell {
           gap: 0.6rem;
           max-width: 360px;
-          font-weight: 500;
+          font-weight: 700;
         }
 
         .badge {
           width: max-content;
           gap: 0.35rem;
           padding: 0.25rem 0.6rem;
-          border-radius: 999px;
+          border-radius: var(--border-radius-pill);
           font-size: 0.75rem;
           font-weight: 600;
         }
@@ -485,7 +523,7 @@ const ProjectDetail = () => {
         .notice {
           gap: 0.5rem;
           padding: 0.85rem 1rem;
-          border-radius: 8px;
+          border-radius: var(--border-radius-md);
           border: 1px solid var(--border-color);
           color: var(--text-secondary);
           background-color: var(--warning-light);
@@ -503,6 +541,8 @@ const ProjectDetail = () => {
           color: var(--text-secondary);
         }
 
+        .files-empty svg { color: var(--accent-color); }
+
         .danger-icon {
           color: var(--danger-color);
         }
@@ -517,9 +557,12 @@ const ProjectDetail = () => {
           gap: 0.7rem;
           padding: 0.85rem;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          background-color: var(--bg-primary);
+          border-radius: var(--border-radius-lg);
+          background-color: var(--bg-elevated);
+          transition: all var(--transition-fast);
         }
+
+        .room-row:hover { border-color: var(--accent-color); transform: translateY(-1px); }
 
         .room-row div {
           display: flex;

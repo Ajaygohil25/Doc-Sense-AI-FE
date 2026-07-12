@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import DocumentChat from '../pages/document/DocumentChat';
@@ -74,6 +75,30 @@ const renderDocumentChat = () => render(
   </MemoryRouter>
 );
 
+const renderStrictDocumentChat = () => render(
+  <StrictMode>
+    <MemoryRouter initialEntries={['/documents/file-1/chat']}>
+      <Routes>
+        <Route path="/documents/:id/chat" element={<DocumentChat />} />
+      </Routes>
+    </MemoryRouter>
+  </StrictMode>
+);
+
+const mockDocumentWithRooms = (document, chatRooms) => {
+  api.get.mockImplementation((url) => {
+    if (url === '/dashboard/get-file-by-id/file-1') {
+      return Promise.resolve({ data: { success: true, data: document } });
+    }
+
+    if (url === '/chat/get-chat-rooms-by-file-id/file-1') {
+      return Promise.resolve({ data: { success: true, data: { chat_rooms: chatRooms } } });
+    }
+
+    return Promise.reject(new Error(`Unhandled GET ${url}`));
+  });
+};
+
 const mockInitialApi = () => {
   api.get.mockImplementation((url) => {
     if (url === '/dashboard/get-file-by-id/file-1') {
@@ -86,6 +111,15 @@ const mockInitialApi = () => {
 
     if (url === '/chat/get-chat-messages-by-room-id/room-latest') {
       return Promise.resolve({ data: { success: true, data: historyPayload } });
+    }
+
+    if (url === '/chat/get-chat-messages-by-room-id/room-old') {
+      return Promise.resolve({
+        data: {
+          success: true,
+          data: { chat_room_id: 'room-old', messages: [] },
+        },
+      });
     }
 
     return Promise.reject(new Error(`Unhandled GET ${url}`));
@@ -113,11 +147,84 @@ describe('DocumentChat', () => {
   });
 
   it('loads rooms, auto-selects the latest room, and renders history', async () => {
-    renderDocumentChat();
+    const { container } = renderDocumentChat();
 
     expect((await screen.findAllByText('Latest room')).length).toBeGreaterThan(0);
     expect(screen.getByText('Stored answer')).toBeInTheDocument();
     expect(api.get).toHaveBeenCalledWith('/chat/get-chat-messages-by-room-id/room-latest');
+    expect(container.querySelector('.chat-workspace')).not.toHaveClass('discord-chat-workspace');
+    expect(container.querySelector('.rooms-panel')).toBeInTheDocument();
+    expect(container.querySelector('.conversation-panel')).toBeInTheDocument();
+  });
+
+  it('defines an inset responsive workspace for the document chat page', async () => {
+    const { container } = renderDocumentChat();
+
+    await screen.findByText('Stored answer');
+    const styles = container.querySelector('style').textContent;
+
+    expect(styles).toMatch(/\.document-chat-page\s*\{[^}]*box-sizing: border-box;/s);
+    expect(styles).toMatch(/\.document-chat-page\s*\{[^}]*padding: 1\.5rem;/s);
+    expect(styles).toMatch(/\.chat-workspace\s*\{[^}]*gap: 1rem;/s);
+    expect(styles).toMatch(/\.rooms-panel\s*\{[^}]*border: 1px solid var\(--border-color\);/s);
+    expect(styles).toMatch(/\.conversation-panel\s*\{[^}]*border: 1px solid var\(--border-color\);/s);
+    expect(styles).toMatch(/\.row-user \.message-text\s*\{[^}]*color: var\(--on-accent\);/s);
+    expect(styles).toMatch(/\.row-assistant \.message-text\s*\{[^}]*color: var\(--text-primary\);/s);
+    expect(styles).toMatch(/\.message-text\s*\{[^}]*font-size: 1rem;[^}]*overflow-wrap: anywhere;/s);
+    expect(styles).toMatch(/\.messages-scroller\s*\{[^}]*width: 100%;[^}]*max-width: 960px;[^}]*margin: 0 auto;/s);
+    expect(styles).toMatch(/\.composer-inner\s*\{[^}]*width: 100%;[^}]*max-width: 960px;[^}]*margin: 0 auto;/s);
+    expect(styles).toMatch(/\.conversation-heading\s*\{[^}]*flex: 1;[^}]*min-width: 0;/s);
+    expect(styles).toMatch(/@media \(max-width: 1023px\)[\s\S]*?\.document-chat-page\s*\{[^}]*padding: 1rem;/);
+    expect(styles).toMatch(/@media \(max-width: 767px\)[\s\S]*?\.document-chat-page\s*\{[^}]*padding: 0\.75rem;/);
+    expect(styles).toMatch(/@media \(max-width: 767px\)[\s\S]*?\.rooms-panel\s*\{[^}]*position: fixed;[^}]*transform: translateX\(-110%\);/);
+    expect(styles).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.connection-pill span,[\s\S]*?\.rooms-drawer-toggle span\s*\{[^}]*display: none;/);
+    expect(container.querySelector('.composer-inner')).toBeInTheDocument();
+  });
+
+  it('opens and closes the mobile rooms drawer with its controls', async () => {
+    renderDocumentChat();
+
+    await screen.findByText('Stored answer');
+    const panel = screen.getByRole('complementary', { name: 'Chat rooms' });
+    const openButton = screen.getByLabelText('Open chat rooms');
+
+    expect(openButton).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(openButton);
+    expect(panel).toHaveClass('mobile-open');
+    expect(openButton).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(screen.getByLabelText('Close chat rooms'));
+    expect(panel).not.toHaveClass('mobile-open');
+  });
+
+  it('closes the mobile rooms drawer from the backdrop and Escape key', async () => {
+    renderDocumentChat();
+
+    await screen.findByText('Stored answer');
+    const panel = screen.getByRole('complementary', { name: 'Chat rooms' });
+    const openButton = screen.getByLabelText('Open chat rooms');
+
+    fireEvent.click(openButton);
+    fireEvent.click(screen.getByLabelText('Dismiss chat rooms'));
+    expect(panel).not.toHaveClass('mobile-open');
+
+    fireEvent.click(openButton);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(panel).not.toHaveClass('mobile-open');
+  });
+
+  it('closes the mobile rooms drawer after selecting a room', async () => {
+    renderDocumentChat();
+
+    await screen.findByText('Stored answer');
+    const panel = screen.getByRole('complementary', { name: 'Chat rooms' });
+    fireEvent.click(screen.getByLabelText('Open chat rooms'));
+    fireEvent.click(screen.getByRole('button', { name: /Older room/i }));
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith('/chat/get-chat-messages-by-room-id/room-old');
+    });
+    expect(panel).not.toHaveClass('mobile-open');
   });
 
   it('creates a named chat room and selects it', async () => {
@@ -149,6 +256,114 @@ describe('DocumentChat', () => {
         name: 'Benefit questions',
       });
     });
+  });
+
+  it('creates and selects a default room when a successful document has no rooms', async () => {
+    mockDocumentWithRooms(fileDetails, []);
+    api.post.mockResolvedValue({
+      data: {
+        success: true,
+        data: {
+          chat_room: {
+            id: 'room-default',
+            file_id: 'file-1',
+            name: 'Default chat',
+            created_at: '2026-06-26T13:00:00',
+          },
+        },
+      },
+    });
+
+    renderDocumentChat();
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledTimes(1);
+      expect(api.post).toHaveBeenCalledWith('/chat/create-chat-room', {
+        file_id: 'file-1',
+        name: 'Default chat',
+      });
+    });
+
+    expect((await screen.findAllByText('Default chat')).length).toBeGreaterThan(0);
+    expect(screen.getByPlaceholderText(/ask a question/i)).toBeEnabled();
+  });
+
+  it('creates the default room only once when effects are repeated', async () => {
+    mockDocumentWithRooms(fileDetails, []);
+    api.post.mockResolvedValue({
+      data: {
+        success: true,
+        data: {
+          chat_room: {
+            id: 'room-default',
+            file_id: 'file-1',
+            name: 'Default chat',
+            created_at: '2026-06-26T13:00:00',
+          },
+        },
+      },
+    });
+
+    renderStrictDocumentChat();
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText(/ask a question/i)).toBeEnabled();
+    });
+    expect(api.post).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a preparation state while the default room is being created', async () => {
+    mockDocumentWithRooms(fileDetails, []);
+    api.post.mockReturnValue(new Promise(() => {}));
+
+    renderDocumentChat();
+
+    expect(await screen.findByText('Preparing your chat...')).toBeInTheDocument();
+  });
+
+  it('offers a retry when automatic room creation fails', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockDocumentWithRooms(fileDetails, []);
+    api.post.mockRejectedValueOnce(new Error('Room service unavailable'));
+
+    renderDocumentChat();
+
+    const retryButton = await screen.findByRole('button', { name: /try again/i });
+    expect(screen.getByText(/could not prepare a chat room/i)).toBeInTheDocument();
+
+    api.post.mockResolvedValueOnce({
+      data: {
+        success: true,
+        data: {
+          chat_room: {
+            id: 'room-retried',
+            file_id: 'file-1',
+            name: 'Default chat',
+            created_at: '2026-06-26T13:05:00',
+          },
+        },
+      },
+    });
+    fireEvent.click(retryButton);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledTimes(2);
+      expect(screen.getByPlaceholderText(/ask a question/i)).toBeEnabled();
+    });
+
+    consoleError.mockRestore();
+  });
+
+  it.each([
+    ['Processing', /question answering is disabled until processing finishes/i],
+    ['Failed', /question answering is disabled because this document failed processing/i],
+  ])('does not create a room when a document status is %s', async (status, notice) => {
+    mockDocumentWithRooms({ ...fileDetails, status }, []);
+
+    renderDocumentChat();
+
+    expect(await screen.findByText(notice)).toBeInTheDocument();
+    expect(api.post).not.toHaveBeenCalled();
   });
 
   it('sends socket questions with the selected chat room id', async () => {

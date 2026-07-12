@@ -38,7 +38,11 @@ export const ToastProvider = ({ children }) => {
           <div key={toast.id} className={`toast toast-${toast.type}`}>
             {getIcon(toast.type)}
             <div className="toast-message">{toast.message}</div>
-            <button className="toast-close-btn" onClick={() => removeToast(toast.id)}>
+            <button
+              className="toast-close-btn"
+              onClick={() => removeToast(toast.id)}
+              aria-label="Dismiss notification"
+            >
               <X size={14} />
             </button>
           </div>
@@ -55,20 +59,23 @@ export const ToastProvider = ({ children }) => {
         }
         
         .toast-close-btn {
-          background: transparent;
-          border: none;
-          color: var(--text-muted);
-          cursor: pointer;
-          display: flex;
+          display: grid;
           align-items: center;
           justify-content: center;
-          padding: 2px;
-          border-radius: 4px;
-          transition: all 0.1s;
+          width: 34px;
+          height: 34px;
+          padding: 0;
+          color: var(--text-muted);
+          background: var(--accent-light);
+          border: 1px solid transparent;
+          border-radius: var(--border-radius-sm);
+          cursor: pointer;
+          transition: all var(--transition-fast);
         }
         
         .toast-close-btn:hover {
-          background-color: var(--border-color);
+          background-color: var(--bg-strong);
+          border-color: var(--border-strong);
           color: var(--text-primary);
         }
       `}</style>

@@ -649,7 +649,7 @@ const ProjectChat = () => {
               disabled={!canSend || !inputText.trim()}
               title={isSending ? 'Waiting for response' : 'Send message'}
             >
-              {isSending ? <Spinner size={16} color="#fff" /> : <Send size={16} />}
+              {isSending ? <Spinner size={16} color="var(--on-accent)" /> : <Send size={16} />}
             </button>
           </form>
         </section>
@@ -695,7 +695,7 @@ const ProjectChat = () => {
                 className="btn btn-primary"
                 disabled={creatingRoom || !newRoomName.trim()}
               >
-                {creatingRoom ? <Spinner size={16} color="#fff" /> : <Plus size={16} />}
+                {creatingRoom ? <Spinner size={16} color="var(--on-accent)" /> : <Plus size={16} />}
                 <span>Create</span>
               </button>
             </div>
@@ -709,7 +709,7 @@ const ProjectChat = () => {
           flex-direction: column;
           height: 100%;
           min-height: 0;
-          background-color: var(--bg-card);
+          background-color: var(--bg-primary);
           overflow: hidden;
         }
 
@@ -731,7 +731,7 @@ const ProjectChat = () => {
 
         .chat-workspace {
           display: grid;
-          grid-template-columns: 320px minmax(0, 1fr);
+          grid-template-columns: 280px minmax(0, 1fr);
           height: 100%;
           min-height: 0;
         }
@@ -741,7 +741,7 @@ const ProjectChat = () => {
           flex-direction: column;
           min-height: 0;
           border-right: 1px solid var(--border-color);
-          background-color: var(--bg-secondary);
+          background: var(--bg-secondary);
         }
 
         .rooms-panel-header,
@@ -763,12 +763,18 @@ const ProjectChat = () => {
         }
 
         .rooms-panel-header {
-          padding: 1rem;
+          min-height: 70px;
+          padding: 0.85rem;
           border-bottom: 1px solid var(--border-color);
         }
 
         .rooms-heading {
           gap: 0.75rem;
+        }
+
+        .rooms-heading h3,
+        .conversation-header h3 {
+          font-size: 1rem;
         }
 
         .rooms-heading span,
@@ -779,23 +785,24 @@ const ProjectChat = () => {
         }
 
         .icon-button {
-          width: 34px;
-          height: 34px;
+          width: 44px;
+          height: 44px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-sm);
           color: var(--text-secondary);
-          background-color: var(--bg-card);
+          background-color: var(--bg-elevated);
           cursor: pointer;
           text-decoration: none;
           flex-shrink: 0;
         }
 
         .icon-button.accent {
-          color: var(--accent-color);
-          background-color: var(--accent-light);
+          color: var(--on-accent);
+          background: var(--accent-color);
+          border-color: var(--accent-color);
         }
 
         .project-context {
@@ -804,6 +811,7 @@ const ProjectChat = () => {
           display: flex;
           flex-direction: column;
           gap: 0.45rem;
+          background: var(--sidebar-user-bg);
         }
 
         .project-context strong {
@@ -831,9 +839,10 @@ const ProjectChat = () => {
           gap: 0.65rem;
           align-items: flex-start;
           text-align: left;
+          min-height: 52px;
           padding: 0.75rem;
           border: 1px solid transparent;
-          border-radius: 8px;
+          border-radius: var(--border-radius-md);
           color: var(--text-primary);
           background-color: transparent;
           cursor: pointer;
@@ -842,8 +851,16 @@ const ProjectChat = () => {
         .room-item.active,
         .room-item:hover {
           border-color: var(--border-color);
-          background-color: var(--accent-light);
+          background-color: var(--sidebar-hover-bg);
         }
+
+        .room-item.active {
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border-color: var(--border-strong);
+        }
+
+        .room-item.active .room-copy small { color: var(--text-secondary); }
 
         .room-copy {
           display: flex;
@@ -880,20 +897,23 @@ const ProjectChat = () => {
           flex-direction: column;
           min-width: 0;
           min-height: 0;
+          background: var(--bg-primary);
         }
 
         .conversation-header {
-          padding: 1rem 1.25rem;
+          min-height: 70px;
+          padding: 0.9rem 1.25rem;
           border-bottom: 1px solid var(--border-color);
           gap: 1rem;
+          background: var(--bg-card);
         }
 
         .connection-pill {
           gap: 0.35rem;
           padding: 0.3rem 0.6rem;
-          border-radius: 999px;
+          border-radius: var(--border-radius-pill);
           font-size: 0.75rem;
-          font-weight: 600;
+          font-weight: 700;
         }
 
         .connection-pill.online {
@@ -910,13 +930,13 @@ const ProjectChat = () => {
           flex: 1;
           min-height: 0;
           overflow: hidden;
-          background-color: var(--bg-primary);
+          background: transparent;
         }
 
         .messages-scroller {
           height: 100%;
           overflow-y: auto;
-          padding: 1.25rem;
+          padding: clamp(1rem, 3vw, 1.75rem);
           display: flex;
           flex-direction: column;
           gap: 0.85rem;
@@ -938,15 +958,15 @@ const ProjectChat = () => {
         .message-bubble {
           max-width: min(720px, 78%);
           padding: 0.75rem 0.9rem;
-          border-radius: 8px;
+          border-radius: var(--border-radius-lg);
           border: 1px solid var(--border-color);
-          background-color: var(--bg-card);
+          background: var(--bg-card);
           box-shadow: var(--shadow-sm);
         }
 
         .row-user .message-bubble {
-          color: #ffffff;
-          background-color: var(--accent-color);
+          color: var(--on-accent);
+          background: var(--accent-color);
           border-color: var(--accent-color);
         }
 
@@ -1001,15 +1021,16 @@ const ProjectChat = () => {
           gap: 0.75rem;
           padding: 1rem 1.25rem;
           border-top: 1px solid var(--border-color);
-          background-color: var(--bg-secondary);
+          background: var(--bg-card);
         }
 
         .chat-input-field {
           flex: 1;
           min-width: 0;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          background-color: var(--bg-card);
+          min-height: 48px;
+          border-radius: var(--border-radius-md);
+          background-color: var(--bg-elevated);
           color: var(--text-primary);
           padding: 0.75rem 0.9rem;
           font: inherit;
@@ -1018,13 +1039,14 @@ const ProjectChat = () => {
         .chat-input-field:focus {
           outline: none;
           border-color: var(--accent-color);
-          box-shadow: 0 0 0 3px var(--accent-glow);
+          box-shadow: 0 0 0 3px var(--accent-light);
         }
 
         .chat-send-btn {
-          width: 44px;
-          height: 44px;
+          width: 48px;
+          height: 48px;
           padding: 0;
+          border-radius: var(--border-radius-pill);
         }
 
         .chat-notice {
@@ -1049,7 +1071,7 @@ const ProjectChat = () => {
         .modal-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(15, 23, 42, 0.45);
+          background: rgba(7, 9, 42, 0.68);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1062,10 +1084,10 @@ const ProjectChat = () => {
           display: flex;
           flex-direction: column;
           gap: 0.85rem;
-          padding: 1.25rem;
+          padding: 1.5rem;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          background-color: var(--bg-card);
+          border-radius: var(--border-radius-xl);
+          background: var(--bg-card);
           box-shadow: var(--shadow-lg);
         }
 
@@ -1074,15 +1096,29 @@ const ProjectChat = () => {
           gap: 0.75rem;
         }
 
-        @media (max-width: 820px) {
+        .modal-header h3 { font-size: 1.25rem; }
+
+        @media (max-width: 767px) {
           .chat-workspace {
             grid-template-columns: 1fr;
-            grid-template-rows: minmax(220px, 34vh) minmax(0, 1fr);
+            grid-template-rows: auto minmax(0, 1fr);
           }
 
           .rooms-panel {
+            min-height: 150px;
+            max-height: 210px;
             border-right: 0;
             border-bottom: 1px solid var(--border-color);
+          }
+
+          .rooms-list {
+            flex-direction: row;
+            overflow-x: auto;
+            overflow-y: hidden;
+          }
+
+          .room-item {
+            min-width: 210px;
           }
 
           .message-bubble {

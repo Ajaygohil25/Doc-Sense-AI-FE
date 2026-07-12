@@ -13,6 +13,7 @@ import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import Home from './pages/dashboard/Home';
+import UploadPage from './pages/dashboard/UploadPage';
 import DocumentsList from './pages/dashboard/DocumentsList';
 import DocumentChat from './pages/document/DocumentChat';
 import ProjectsList from './pages/projects/ProjectsList';
@@ -79,6 +80,17 @@ function App() {
               }
             />
             
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute>
+                  <AuthenticatedLayout>
+                    <UploadPage />
+                  </AuthenticatedLayout>
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/documents"
               element={

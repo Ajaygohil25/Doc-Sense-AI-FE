@@ -4,6 +4,7 @@ import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import { Spinner } from '../../components/ui/Loader';
 import { BrainCircuit, Mail, ArrowLeft } from 'lucide-react';
+import './auth.css';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -85,7 +86,7 @@ const ForgotPassword = () => {
               </div>
 
               <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                {loading ? <Spinner size={18} color="#fff" /> : 'Send Reset Link'}
+                {loading ? <Spinner size={18} color="var(--on-accent)" /> : 'Send Reset Link'}
               </button>
             </form>
           ) : (
@@ -138,18 +139,19 @@ const ForgotPassword = () => {
         .success-icon-badge {
           width: 64px;
           height: 64px;
-          border-radius: 50%;
-          background-color: var(--accent-light);
+          border-radius: var(--border-radius-lg);
+          background: var(--accent-light);
           color: var(--accent-color);
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.5rem auto;
+          box-shadow: var(--shadow-sm);
         }
 
         .success-state h3 {
           font-size: 1.5rem;
-          font-weight: 700;
+          font-weight: 800;
           margin-bottom: 0.75rem;
         }
 
@@ -163,9 +165,9 @@ const ForgotPassword = () => {
           margin-top: 1rem;
           font-size: 0.8rem !important;
           color: var(--text-muted) !important;
-          background-color: var(--bg-primary);
+          background-color: var(--bg-elevated);
           padding: 0.75rem;
-          border-radius: var(--border-radius-md);
+          border-radius: var(--border-radius-lg);
           border: 1px dashed var(--border-color);
         }
       `}</style>

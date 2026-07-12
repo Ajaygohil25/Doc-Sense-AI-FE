@@ -68,12 +68,14 @@ describe('ProjectDetail', () => {
   });
 
   it('loads project files and chat rooms', async () => {
-    renderProjectDetail();
+    const { container } = renderProjectDetail();
 
     expect(await screen.findByText('Policy KB')).toBeInTheDocument();
     expect(screen.getByText('Policy.pdf')).toBeInTheDocument();
     expect(screen.getByText('Default chat')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open project chat/i })).toBeEnabled();
+    expect(container.querySelector('.project-detail-page')).not.toHaveClass('discord-route');
+    expect(container.querySelectorAll('.project-section').length).toBeGreaterThanOrEqual(2);
   });
 
   it('uploads one project PDF with multipart form data and refreshes project detail', async () => {

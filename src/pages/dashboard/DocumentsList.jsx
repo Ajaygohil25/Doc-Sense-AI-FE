@@ -142,7 +142,7 @@ const DocumentsList = () => {
             <RefreshCw size={16} className={loading ? 'spin-slow' : ''} />
             <span>Refresh</span>
           </button>
-          <Link to="/" className="btn btn-primary">
+          <Link to="/upload" className="btn btn-primary">
             <Upload size={16} />
             <span>Upload New</span>
           </Link>
@@ -158,7 +158,7 @@ const DocumentsList = () => {
           </div>
           <h3>No documents found</h3>
           <p>You haven't uploaded any documents yet. Upload a PDF file to begin analysis.</p>
-          <Link to="/" className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
+          <Link to="/upload" className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
             Upload First PDF
           </Link>
         </div>
@@ -233,239 +233,163 @@ const DocumentsList = () => {
 
         .documents-list-header {
           display: flex;
+          align-items: flex-end;
           justify-content: space-between;
-          align-items: center;
+          gap: 1rem;
         }
 
-        .header-actions {
-          display: flex;
-          gap: 0.75rem;
+        .documents-list-header h1 {
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          line-height: 1.2;
         }
+
+        .header-actions { display: flex; gap: 0.75rem; }
 
         .empty-state {
-          padding: 4rem 2rem;
-          text-align: center;
           display: flex;
+          min-height: 440px;
           flex-direction: column;
           align-items: center;
-          gap: 0.75rem;
+          justify-content: center;
+          gap: 0.85rem;
+          padding: 4rem 2rem;
+          text-align: center;
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
         }
 
         .empty-icon-badge {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          background-color: var(--bg-primary);
-          color: var(--text-muted);
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          display: grid;
+          width: 90px;
+          height: 90px;
+          margin-bottom: 0.5rem;
+          place-items: center;
+          color: var(--accent-color);
+          background: var(--accent-light);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-lg);
           box-shadow: var(--shadow-sm);
         }
 
-        .empty-state h3 {
-          font-size: 1.5rem;
-          font-weight: 600;
-        }
-
-        .empty-state p {
-          font-size: 0.95rem;
-          color: var(--text-secondary);
-          max-width: 400px;
-          line-height: 1.6;
-        }
+        .empty-state h3 { font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 700; }
+        .empty-state p { max-width: 430px; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.65; }
 
         .table-container {
           padding: 0;
-          overflow: hidden;
+          overflow-x: auto;
+          border-radius: var(--border-radius-xl);
         }
 
         .documents-table {
           width: 100%;
+          min-width: 720px;
           border-collapse: collapse;
         }
 
-        .documents-table th, .documents-table td {
-          padding: 1rem 1.5rem;
+        .documents-table th,
+        .documents-table td {
+          padding: 1.05rem 1.4rem;
           text-align: left;
-          font-size: 0.9rem;
+          font-size: 0.88rem;
         }
 
         .documents-table th {
-          font-weight: 600;
-          color: var(--text-secondary);
-          background-color: var(--bg-primary);
-          border-bottom: 1px solid var(--border-color);
-        }
-
-        .documents-table td {
-          border-bottom: 1px solid var(--border-color);
           color: var(--text-primary);
+          background: var(--bg-strong);
+          border-bottom: 1px solid var(--border-color);
+          font-size: 0.73rem;
+          font-weight: 700;
+          letter-spacing: 0.07em;
         }
 
-        .documents-table tr:last-child td {
-          border-bottom: none;
-        }
+        .documents-table td { color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+        .documents-table tbody tr { transition: background-color var(--transition-fast); }
+        .documents-table tbody tr:hover { background: var(--accent-light); }
+        .documents-table tr:last-child td { border-bottom: none; }
 
-        .doc-name-cell {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-weight: 500;
-          max-width: 320px;
-        }
+        .doc-name-cell { display: flex; align-items: center; gap: 0.75rem; max-width: 320px; font-weight: 700; }
+        .doc-name-cell span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .doc-icon { flex: 0 0 auto; color: var(--accent-color); }
 
-        .doc-name-cell span {
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .doc-icon {
-          color: var(--accent-color);
-          flex-shrink: 0;
-        }
-
-        /* Status Badges */
         .badge {
           display: inline-flex;
           align-items: center;
-          gap: 0.375rem;
-          padding: 0.25rem 0.625rem;
-          border-radius: 9999px;
-          font-size: 0.75rem;
-          font-weight: 600;
+          gap: 0.38rem;
+          min-height: 30px;
+          padding: 0.3rem 0.65rem;
+          border: 1px solid currentColor;
+          border-radius: var(--border-radius-pill);
+          font-size: 0.72rem;
+          font-weight: 700;
           text-transform: capitalize;
         }
 
-        .badge-success {
-          background-color: var(--success-light);
-          color: var(--success-color);
-        }
-
-        .badge-processing {
-          background-color: var(--accent-light);
-          color: var(--accent-color);
-        }
-
-        .badge-failed {
-          background-color: var(--danger-light);
-          color: var(--danger-color);
-        }
-
-        .badge-pending {
-          background-color: var(--warning-light);
-          color: var(--warning-color);
-        }
-
-        .actions-cell {
-          display: flex;
-          gap: 0.5rem;
-        }
+        .badge-success { color: var(--success-color); background: var(--success-light); }
+        .badge-processing { color: var(--accent-color); background: var(--accent-light); }
+        .badge-failed { color: var(--danger-color); background: var(--danger-light); }
+        .badge-pending { color: var(--warning-color); background: var(--warning-light); }
+        .actions-cell { display: flex; gap: 0.5rem; }
 
         .action-btn {
           display: inline-flex;
           align-items: center;
-          gap: 0.375rem;
-          padding: 0.4rem 0.8rem;
-          border-radius: var(--border-radius-md);
-          border: 1px solid var(--border-color);
-          font-size: 0.8rem;
-          font-weight: 500;
-          background-color: var(--bg-secondary);
+          gap: 0.38rem;
+          min-height: 38px;
+          padding: 0.45rem 0.75rem;
           color: var(--text-secondary);
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-sm);
+          font-size: 0.78rem;
+          font-weight: 700;
           cursor: pointer;
           transition: all var(--transition-fast);
         }
 
-        .action-btn:hover {
-          background-color: var(--bg-primary);
-          border-color: var(--text-muted);
-        }
+        .action-btn:hover { color: var(--text-primary); background: var(--accent-light); border-color: var(--accent-color); }
+        .btn-chat { color: var(--on-accent); background: var(--accent-color); border-color: var(--accent-color); }
+        .btn-chat:hover { color: var(--on-accent); background: var(--accent-hover); }
+        .spin-slow { animation: spin 3s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .btn-chat {
-          border-color: var(--accent-color);
-          color: var(--accent-color);
-          background-color: var(--accent-light);
-        }
-
-        .btn-chat:hover {
-          background-color: var(--accent-color);
-          color: white;
-        }
-
-        .spin-slow {
-          animation: spin 3s linear infinite;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        /* Pagination Styling */
         .pagination-bar {
+          position: sticky;
+          left: 0;
           display: flex;
-          justify-content: space-between;
           align-items: center;
-          padding: 1rem 1.5rem;
-          background-color: var(--bg-primary);
+          justify-content: space-between;
+          min-width: 100%;
+          padding: 1rem 1.4rem;
+          background: var(--bg-elevated);
           border-top: 1px solid var(--border-color);
         }
 
-        .pagination-info {
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-        }
-
-        .pagination-controls {
-          display: flex;
-          gap: 0.5rem;
-        }
+        .pagination-info { color: var(--text-secondary); font-size: 0.8rem; }
+        .pagination-controls { display: flex; gap: 0.5rem; }
 
         .pagination-btn {
-          width: 32px;
-          height: 32px;
+          display: grid;
+          width: 40px;
+          height: 40px;
+          place-items: center;
+          color: var(--text-primary);
+          background: var(--bg-card);
           border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-md);
-          background-color: var(--bg-secondary);
-          color: var(--text-secondary);
+          border-radius: 50%;
           cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
           transition: all var(--transition-fast);
         }
 
-        .pagination-btn:hover:not(:disabled) {
-          border-color: var(--text-muted);
-          background-color: var(--bg-primary);
-        }
+        .pagination-btn:hover:not(:disabled) { color: #ffffff; background: var(--accent-color); border-color: var(--accent-color); }
+        .pagination-btn:disabled { opacity: 0.38; cursor: not-allowed; }
 
-        .pagination-btn:disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
-        }
-
-        @media (max-width: 768px) {
-          .documents-list-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-          }
-          
-          .header-actions {
-            width: 100%;
-          }
-          
-          .header-actions button, .header-actions a {
-            flex: 1;
-          }
-
-          .documents-table th:nth-child(2),
-          .documents-table td:nth-child(2) {
-            display: none;
-          }
+        @media (max-width: 767px) {
+          .documents-list-header { flex-direction: column; align-items: flex-start; }
+          .header-actions { width: 100%; }
+          .header-actions button,
+          .header-actions a { flex: 1; }
+          .empty-state { min-height: 360px; padding: 2.5rem 1.25rem; }
+          .pagination-bar { gap: 1rem; }
         }
       `}</style>
     </div>

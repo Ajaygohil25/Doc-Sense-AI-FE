@@ -1,474 +1,377 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
-import { useToast } from '../../context/ToastContext';
-import { UploadCloud, File, AlertCircle, CheckCircle } from 'lucide-react';
-import { Spinner } from '../../components/ui/Loader';
+import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  Blocks,
+  CheckCircle2,
+  FileSearch,
+  FolderKanban,
+  MessageSquareText,
+  ShieldCheck,
+  UploadCloud,
+  Workflow
+} from 'lucide-react';
 
-const Home = () => {
-  const [dragActive, setDragActive] = useState(false);
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [uploadedFileId, setUploadedFileId] = useState(null);
-  
-  const fileInputRef = useRef(null);
-  const { showToast } = useToast();
-  const navigate = useNavigate();
+const features = [
+  {
+    icon: MessageSquareText,
+    title: 'Single-document chat',
+    body: 'Upload one PDF and ask focused questions in a dedicated document chat room.'
+  },
+  {
+    icon: FolderKanban,
+    title: 'Project knowledge bases',
+    body: 'Create project workspaces for related PDFs that need to answer together.'
+  },
+  {
+    icon: FileSearch,
+    title: 'Source-grounded answers',
+    body: 'Ask questions against indexed document context instead of loose summaries.'
+  },
+  {
+    icon: Workflow,
+    title: 'Processing visibility',
+    body: 'Track uploaded files through the document library and resume from the right place.'
+  },
+  {
+    icon: Blocks,
+    title: 'Reusable chat rooms',
+    body: 'Continue file and project conversations without rebuilding the same context.'
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Profile and security',
+    body: 'Manage account details and password controls inside the authenticated app.'
+  }
+];
 
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
-  };
+const steps = [
+  'Upload a single PDF or create a project.',
+  'Let Doc-Sense AI process the file content.',
+  'Ask questions from the document or project chat.'
+];
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+const Home = () => (
+  <div className="dashboard-home">
+    <section className="dashboard-hero card" aria-labelledby="home-hero-title">
+      <div className="hero-copy">
+        <span className="section-kicker">Dashboard</span>
+        <h1 id="home-hero-title">Welcome to Doc-Sense AI</h1>
+        <p>
+          Upload PDFs, build project knowledge bases, and ask document-grounded questions from one
+          workspace. Choose the workflow you need and continue from your document history anytime.
+        </p>
+        <div className="hero-actions" aria-label="Primary actions">
+          <Link className="btn btn-primary" to="/upload">
+            <UploadCloud size={16} aria-hidden="true" />
+            Upload a PDF
+          </Link>
+          <Link className="btn btn-secondary" to="/projects">
+            Open projects
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      validateAndSetFile(e.dataTransfer.files[0]);
-    }
-  };
+      <div className="hero-summary" aria-label="Workspace summary">
+        <div className="summary-card">
+          <span>01</span>
+          <strong>Single file</strong>
+          <p>Focused PDF analysis</p>
+        </div>
+        <div className="summary-card">
+          <span>02</span>
+          <strong>Project KB</strong>
+          <p>Multi-file context</p>
+        </div>
+        <div className="summary-card">
+          <span>03</span>
+          <strong>Chat rooms</strong>
+          <p>Reusable conversations</p>
+        </div>
+      </div>
+    </section>
 
-  const handleChange = (e) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      validateAndSetFile(e.target.files[0]);
-    }
-  };
+    <section className="quick-actions" aria-label="Workspace shortcuts">
+      <Link className="action-card card" to="/upload">
+        <UploadCloud size={22} aria-hidden="true" />
+        <div>
+          <h2>Upload PDF</h2>
+          <p>Start a single-document chat workflow.</p>
+        </div>
+      </Link>
+      <Link className="action-card card" to="/documents">
+        <FileSearch size={22} aria-hidden="true" />
+        <div>
+          <h2>My Documents</h2>
+          <p>Review uploads and continue file chats.</p>
+        </div>
+      </Link>
+      <Link className="action-card card" to="/projects">
+        <FolderKanban size={22} aria-hidden="true" />
+        <div>
+          <h2>Projects</h2>
+          <p>Manage shared project knowledge bases.</p>
+        </div>
+      </Link>
+    </section>
 
-  const validateAndSetFile = (selectedFile) => {
-    if (selectedFile.type !== 'application/pdf') {
-      showToast('Invalid file type. Please upload a PDF file.', 'error');
-      return;
-    }
-    // Limit to 20MB for safety
-    if (selectedFile.size > 20 * 1024 * 1024) {
-      showToast('File size is too large. Maximum size is 20MB.', 'error');
-      return;
-    }
-    setFile(selectedFile);
-    setUploadedFileId(null);
-    setProgress(0);
-  };
+    <section className="home-section" aria-labelledby="feature-section-title">
+      <div className="section-header">
+        <span className="section-kicker">Features</span>
+        <h2 id="feature-section-title">Everything available from the home page</h2>
+      </div>
+      <div className="feature-grid">
+        {features.map(({ icon: Icon, title, body }) => (
+          <article className="feature-card card" key={title}>
+            <div className="feature-icon">
+              <Icon size={20} aria-hidden="true" />
+            </div>
+            <h3>{title}</h3>
+            <p>{body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
 
-  const onButtonClick = () => {
-    fileInputRef.current.click();
-  };
+    <section className="workflow-panel card" aria-labelledby="workflow-title">
+      <div className="section-header">
+        <span className="section-kicker">Workflow</span>
+        <h2 id="workflow-title">Move from file to answer in three steps</h2>
+      </div>
+      <div className="step-list">
+        {steps.map((step) => (
+          <div className="step-row" key={step}>
+            <CheckCircle2 size={18} aria-hidden="true" />
+            <span>{step}</span>
+          </div>
+        ))}
+      </div>
+    </section>
 
-  const formatBytes = (bytes, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  };
-
-  const handleUpload = async () => {
-    if (!file) return;
-
-    setUploading(true);
-    setProgress(10); // Start progress bar visual
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    // Simulate progress animation for smoother UX
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 10;
-      });
-    }, 200);
-
-    try {
-      // POST /api/v1/dashboard/file-upload
-      const res = await api.post('/dashboard/file-upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      clearInterval(progressInterval);
-      setProgress(100);
-
-      if (res.data.success && res.data.data) {
-        showToast('File uploaded successfully!', 'success');
-        setUploadedFileId(res.data.data.id);
+    <style>{`
+      .dashboard-home {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        text-align: left;
       }
-    } catch (err) {
-      clearInterval(progressInterval);
-      setProgress(0);
-      console.error(err);
-      const errMsg = err.response?.data?.error || err.response?.data?.detail || 'Failed to upload file.';
-      showToast(errMsg, 'error');
-    } finally {
-      setUploading(false);
-    }
-  };
 
-  return (
-    <div className="dashboard-home">
-      <div className="dashboard-header">
-        <h1>Dashboard</h1>
-        <p className="subtitle">Ingest a PDF document to begin chatting with its contents.</p>
-      </div>
+      .dashboard-hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+        gap: clamp(1.5rem, 4vw, 3rem);
+        align-items: stretch;
+        padding: clamp(1.5rem, 4vw, 2.25rem);
+        overflow: hidden;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-sm);
+      }
 
-      <div className="upload-container card">
-        <form 
-          className={`dropzone ${dragActive ? 'drag-active' : ''} ${file ? 'has-file' : ''}`}
-          onDragEnter={handleDrag}
-          onDragOver={handleDrag}
-          onDragLeave={handleDrag}
-          onDrop={handleDrop}
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="file-input-hidden"
-            accept=".pdf"
-            onChange={handleChange}
-            disabled={uploading}
-          />
+      .hero-copy,
+      .hero-summary {
+        position: relative;
+        z-index: 1;
+      }
 
-          {!file ? (
-            <div className="dropzone-content" onClick={onButtonClick}>
-              <div className="upload-icon-wrapper">
-                <UploadCloud size={40} />
-              </div>
-              <h3>Drag & drop your PDF file here</h3>
-              <p className="browse-text">or <span className="browse-link">browse your files</span></p>
-              <span className="file-constraints">PDF only (Max 20MB)</span>
-            </div>
-          ) : (
-            <div className="file-preview-content">
-              <div className="file-info-box">
-                <File size={36} className="file-icon" />
-                <div className="file-details">
-                  <div className="file-name" title={file.name}>{file.name}</div>
-                  <div className="file-size">{formatBytes(file.size)}</div>
-                </div>
-              </div>
+      .hero-copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+      }
 
-              {progress > 0 && (
-                <div className="upload-progress-wrapper">
-                  <div className="progress-bar-bg">
-                    <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
-                  </div>
-                  <div className="progress-text-row">
-                    <span>{progress === 100 ? 'Processing...' : 'Uploading...'}</span>
-                    <span>{progress}%</span>
-                  </div>
-                </div>
-              )}
+      .section-kicker {
+        width: fit-content;
+        padding: 0.38rem 0.72rem;
+        color: var(--accent-color);
+        background: var(--accent-light);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-pill);
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
 
-              {uploadedFileId ? (
-                <div className="upload-success-state">
-                  <CheckCircle size={20} className="success-icon" />
-                  <span>Your document is ready for analysis.</span>
-                </div>
-              ) : null}
+      .dashboard-hero .section-kicker {
+        color: var(--accent-color);
+        background: var(--accent-light);
+        border-color: var(--border-color);
+      }
 
-              <div className="preview-actions">
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={() => setFile(null)} 
-                  disabled={uploading}
-                >
-                  Remove File
-                </button>
-                
-                {uploadedFileId ? (
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={() => navigate(`/documents/${uploadedFileId}/chat`)}
-                  >
-                    Start Chatting
-                  </button>
-                ) : (
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={handleUpload} 
-                    disabled={uploading}
-                  >
-                    {uploading ? <Spinner size={16} color="#fff" /> : 'Upload & Process'}
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </form>
-      </div>
+      .dashboard-hero h1 {
+        max-width: 18ch;
+        color: var(--text-primary);
+        font-size: clamp(2.1rem, 5vw, 3rem);
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+      }
 
-      <div className="info-cards-row">
-        <div className="info-card card">
-          <div className="info-icon-badge">
-            <UploadCloud size={20} />
-          </div>
-          <h3>1. Ingest PDF</h3>
-          <p>Drag and drop any standard PDF document. The RAG pipeline processes it automatically in the background.</p>
-        </div>
+      .dashboard-hero p {
+        max-width: 640px;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.6;
+      }
 
-        <div className="info-card card">
-          <div className="info-icon-badge">
-            <File size={20} />
-          </div>
-          <h3>2. Track Status</h3>
-          <p>View document statuses like "pending" or processing phases in real-time in the documents explorer.</p>
-        </div>
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.875rem;
+        margin-top: 0.75rem;
+      }
 
-        <div className="info-card card">
-          <div className="info-icon-badge">
-            <AlertCircle size={20} />
-          </div>
-          <h3>3. Ask & Converse</h3>
-          <p>Launch the chat room and ask natural language questions. Get answers backed by your file's metadata.</p>
-        </div>
-      </div>
+      .dashboard-hero .btn-secondary {
+        color: var(--text-primary);
+        background: var(--bg-card);
+        border-color: var(--border-strong);
+      }
 
-      <style>{`
-        .dashboard-home {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-          text-align: left;
-        }
+      .hero-summary {
+        display: grid;
+        align-content: center;
+        gap: 0.9rem;
+      }
 
-        .dashboard-header h1 {
-          font-size: 2rem;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
+      .summary-card {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        column-gap: 1rem;
+        align-items: center;
+        padding: 1rem 1.1rem;
+        color: var(--text-primary);
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+      }
 
-        .subtitle {
-          font-size: 1rem;
-          color: var(--text-muted);
-          margin-top: 0.25rem;
-        }
+      .summary-card span {
+        grid-row: 1 / span 2;
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--accent-color);
+      }
 
-        .upload-container {
-          padding: 2.5rem;
-        }
+      .summary-card strong { color: var(--text-primary); font-size: 0.95rem; }
+      .summary-card p { margin: 0; color: var(--text-secondary); font-size: 0.8rem; }
 
-        .dropzone {
-          border: 2px dashed var(--border-color);
-          border-radius: var(--border-radius-lg);
-          padding: 3rem 1.5rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: var(--bg-primary);
-          transition: all var(--transition-normal);
-          cursor: pointer;
-          min-height: 250px;
-        }
+      .quick-actions,
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.15rem;
+      }
 
-        .dropzone:hover, .dropzone.drag-active {
-          border-color: var(--accent-color);
-          background-color: var(--accent-light);
-        }
+      .action-card {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        min-height: 132px;
+        color: inherit;
+        text-decoration: none;
+      }
 
-        .dropzone.has-file {
-          border-style: solid;
-          cursor: default;
-          background-color: var(--bg-secondary);
-        }
+      .action-card::after {
+        content: '→';
+        position: absolute;
+        right: 1.25rem;
+        bottom: 1rem;
+        color: var(--accent-color);
+        font-size: 1.2rem;
+        font-weight: 800;
+      }
 
-        .file-input-hidden {
-          display: none;
-        }
+      .action-card > svg,
+      .feature-icon {
+        display: grid;
+        flex: 0 0 auto;
+        place-items: center;
+        color: var(--accent-color);
+        background: var(--accent-light);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+      }
 
-        .dropzone-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 0.5rem;
-          width: 100%;
-        }
+      .action-card > svg { box-sizing: content-box; padding: 0.72rem; }
+      .action-card h2 { margin-bottom: 0.3rem; font-size: 1.1rem; }
 
-        .upload-icon-wrapper {
-          width: 64px;
-          height: 64px;
-          border-radius: 50%;
-          background-color: var(--bg-secondary);
-          color: var(--text-muted);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 0.5rem;
-          box-shadow: var(--shadow-sm);
-          transition: all var(--transition-normal);
-        }
+      .action-card p,
+      .feature-card p,
+      .step-row span { color: var(--text-secondary); font-size: 0.9rem; }
 
-        .dropzone:hover .upload-icon-wrapper {
-          color: var(--accent-color);
-          background-color: var(--bg-secondary);
-          transform: scale(1.05);
-        }
+      .home-section { display: flex; flex-direction: column; gap: 1.25rem; }
+      .section-header { display: flex; flex-direction: column; gap: 0.6rem; }
+      .section-header h2,
+      .workflow-panel h2 { max-width: 20ch; font-size: clamp(1.5rem, 3vw, 2rem); }
 
-        .dropzone-content h3 {
-          font-size: 1.125rem;
-          font-weight: 600;
-        }
+      .feature-card {
+        position: relative;
+        display: flex;
+        min-height: 210px;
+        flex-direction: column;
+        gap: 0.8rem;
+        padding-top: 1.75rem;
+      }
 
-        .browse-text {
-          font-size: 0.9rem;
-          color: var(--text-secondary);
-        }
+      .feature-card:nth-child(2),
+      .feature-card:nth-child(5) { background: var(--bg-elevated); }
 
-        .browse-link {
-          color: var(--accent-color);
-          font-weight: 600;
-          text-decoration: underline;
-        }
+      .feature-icon { width: 46px; height: 46px; }
+      .feature-card h3 { margin-top: auto; font-size: 1.14rem; }
 
-        .file-constraints {
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          margin-top: 0.25rem;
-        }
+      .workflow-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
+        gap: 2rem;
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        background: var(--bg-card);
+      }
 
-        .file-preview-content {
-          width: 100%;
-          max-width: 450px;
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
+      .step-list { display: flex; flex-direction: column; gap: 0.8rem; }
 
-        .file-info-box {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 1rem;
-          border-radius: var(--border-radius-md);
-          background-color: var(--bg-primary);
-          border: 1px solid var(--border-color);
-        }
+      .step-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        min-height: 56px;
+        padding: 0.85rem 1rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+      }
 
-        .file-icon {
-          color: var(--accent-color);
-        }
+      .step-row svg { flex: 0 0 auto; color: var(--accent-color); }
 
-        .file-details {
-          display: flex;
-          flex-direction: column;
-          min-width: 0;
-          text-align: left;
-        }
+      @media (max-width: 1023px) {
+        .dashboard-hero,
+        .workflow-panel { grid-template-columns: 1fr; }
+        .dashboard-hero { min-height: 0; }
+        .hero-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .summary-card { grid-template-columns: 1fr; }
+        .summary-card span { grid-row: auto; }
+        .quick-actions,
+        .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
 
-        .file-name {
-          font-size: 0.925rem;
-          font-weight: 600;
-          color: var(--text-primary);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .file-size {
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-          margin-top: 0.125rem;
-        }
-
-        .upload-progress-wrapper {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          text-align: left;
-        }
-
-        .progress-bar-bg {
-          height: 6px;
-          background-color: var(--border-color);
-          border-radius: 3px;
-          overflow: hidden;
-        }
-
-        .progress-bar-fill {
-          height: 100%;
-          background-color: var(--accent-color);
-          transition: width 0.2s ease;
-        }
-
-        .progress-text-row {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.75rem;
-          color: var(--text-secondary);
-        }
-
-        .upload-success-state {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          color: var(--success-color);
-          font-size: 0.875rem;
-          font-weight: 500;
-        }
-
-        .preview-actions {
-          display: flex;
-          gap: 1rem;
-          justify-content: flex-end;
-        }
-
-        .info-cards-row {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
-        }
-
-        .info-card {
-          padding: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .info-icon-badge {
-          width: 40px;
-          height: 40px;
-          border-radius: var(--border-radius-md);
-          background-color: var(--accent-light);
-          color: var(--accent-color);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .info-card h3 {
-          font-size: 1.1rem;
-          font-weight: 600;
-        }
-
-        .info-card p {
-          font-size: 0.875rem;
-          color: var(--text-secondary);
-          line-height: 1.5;
-        }
-
-        @media (max-width: 900px) {
-          .info-cards-row {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
-    </div>
-  );
-};
+      @media (max-width: 639px) {
+        .dashboard-home { gap: 1.25rem; }
+        .dashboard-hero { padding: 1.5rem; border-radius: var(--border-radius-xl); }
+        .dashboard-hero h1 { font-size: clamp(1.9rem, 10vw, 2.5rem); }
+        .hero-actions { align-items: stretch; flex-direction: column; }
+        .hero-actions .btn { width: 100%; }
+        .hero-summary,
+        .quick-actions,
+        .feature-grid { grid-template-columns: 1fr; }
+        .summary-card { grid-template-columns: auto 1fr; }
+        .summary-card span { grid-row: 1 / span 2; }
+        .feature-card { min-height: 180px; }
+      }
+    `}</style>
+  </div>
+);
 
 export default Home;

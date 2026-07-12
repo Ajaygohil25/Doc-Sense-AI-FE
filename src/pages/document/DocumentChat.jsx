@@ -66,6 +66,7 @@ const DocumentChat = () => {
   const { showToast } = useToast();
   const chatEndRef = useRef(null);
   const activeRoomRef = useRef(null);
+  const initialRoomRequestRef = useRef(null);
 
   const [fileDetails, setFileDetails] = useState(null);
   const [pageLoading, setPageLoading] = useState(true);
@@ -79,6 +80,9 @@ const DocumentChat = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newRoomName, setNewRoomName] = useState('');
   const [creatingRoom, setCreatingRoom] = useState(false);
+  const [initialRoomLoading, setInitialRoomLoading] = useState(false);
+  const [initialRoomError, setInitialRoomError] = useState('');
+  const [roomsDrawerOpen, setRoomsDrawerOpen] = useState(false);
 
   const {
     isConnected,
@@ -126,6 +130,62 @@ const DocumentChat = () => {
     }
   }, [showToast]);
 
+  const activateCreatedRoom = useCallback((createdRoom) => {
+    setRooms((prev) => [
+      createdRoom,
+      ...prev.filter((room) => String(room.id) !== String(createdRoom.id))
+    ]);
+    setSelectedRoomId(createdRoom.id);
+    activeRoomRef.current = createdRoom.id;
+    setMessages([]);
+    setInitialRoomError('');
+  }, []);
+
+  const createDefaultRoom = useCallback(async () => {
+    if (initialRoomRequestRef.current) {
+      return initialRoomRequestRef.current;
+    }
+
+    const request = (async () => {
+      setInitialRoomLoading(true);
+      setInitialRoomError('');
+
+      try {
+        const res = await api.post('/chat/create-chat-room', {
+          file_id: id,
+          name: 'Default chat'
+        });
+        const createdRoom = res.data.data?.chat_room;
+
+        if (!createdRoom) {
+          throw new Error('Invalid create chat room response.');
+        }
+
+        activateCreatedRoom(createdRoom);
+        return createdRoom;
+      } catch (err) {
+        console.error(err);
+        const fallback = err.message || 'Failed to create the default chat room.';
+        const errorMessage = getErrorMessage(err, fallback);
+        setInitialRoomError(errorMessage);
+        showToast(errorMessage, 'error');
+        return null;
+      } finally {
+        setInitialRoomLoading(false);
+      }
+    })();
+
+    initialRoomRequestRef.current = request;
+
+    try {
+      return await request;
+    } finally {
+      if (initialRoomRequestRef.current === request) {
+        initialRoomRequestRef.current = null;
+      }
+    }
+  }, [activateCreatedRoom, id, showToast]);
+
   const loadDocumentChat = useCallback(async () => {
     setPageLoading(true);
 
@@ -142,12 +202,17 @@ const DocumentChat = () => {
       setFileDetails(fileData);
       setRooms(roomList);
       setSelectedRoomId(initialRoomId);
+      setInitialRoomError('');
 
       if (initialRoomId) {
         await loadMessages(initialRoomId);
       } else {
         activeRoomRef.current = null;
         setMessages([]);
+
+        if (isSuccessStatus(fileData.status)) {
+          await createDefaultRoom();
+        }
       }
     } catch (err) {
       console.error(err);
@@ -155,7 +220,7 @@ const DocumentChat = () => {
     } finally {
       setPageLoading(false);
     }
-  }, [id, loadMessages, showToast]);
+  }, [createDefaultRoom, id, loadMessages, showToast]);
 
   useEffect(() => {
     loadDocumentChat();
@@ -169,6 +234,19 @@ const DocumentChat = () => {
     if (!socketError) return;
     showToast(socketError, 'error');
   }, [socketError, showToast]);
+
+  useEffect(() => {
+    if (!roomsDrawerOpen) return undefined;
+
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') {
+        setRoomsDrawerOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [roomsDrawerOpen]);
 
   const isCurrentSocketEvent = useCallback((event) => (
     event
@@ -331,6 +409,7 @@ const DocumentChat = () => {
   }, [id, lastError, pendingRequestId, selectedRoomId, upsertAssistantMessage]);
 
   const handleRoomSelect = async (room) => {
+    setRoomsDrawerOpen(false);
     if (!room || String(room.id) === String(selectedRoomId)) return;
 
     setSelectedRoomId(room.id);
@@ -359,13 +438,7 @@ const DocumentChat = () => {
         throw new Error('Invalid create chat room response.');
       }
 
-      setRooms((prev) => [
-        createdRoom,
-        ...prev.filter((room) => String(room.id) !== String(createdRoom.id))
-      ]);
-      setSelectedRoomId(createdRoom.id);
-      activeRoomRef.current = createdRoom.id;
-      setMessages([]);
+      activateCreatedRoom(createdRoom);
       setNewRoomName('');
       setCreateModalOpen(false);
     } catch (err) {
@@ -478,6 +551,8 @@ const DocumentChat = () => {
   };
 
   const getInputPlaceholder = () => {
+    if (initialRoomLoading) return 'Preparing your chat...';
+    if (initialRoomError && documentCanAnswer) return 'Create a chat room to continue...';
     if (!selectedRoomId) return 'Create or select a chat room first...';
     if (!documentCanAnswer) return 'Document processing must finish before questions can be sent...';
     if (isSending) return 'Waiting for the answer...';
@@ -488,7 +563,7 @@ const DocumentChat = () => {
     return (
       <div className="chat-loading-screen">
         <Spinner size={40} />
-        <p>Loading document chat...</p>
+        <p>{initialRoomLoading ? 'Preparing your chat...' : 'Loading document chat...'}</p>
       </div>
     );
   }
@@ -497,10 +572,10 @@ const DocumentChat = () => {
     return (
       <div className="chat-error-screen">
         <AlertCircle size={48} className="error-icon" />
-        <h2>Document Not Found</h2>
+        <h2>Document not found</h2>
         <p>We could not retrieve this document or you do not have permission to view it.</p>
         <Link to="/documents" className="btn btn-primary">
-          Return to Documents
+          Return to documents
         </Link>
       </div>
     );
@@ -511,26 +586,50 @@ const DocumentChat = () => {
       {renderStatusNotice()}
 
       <div className="chat-workspace">
-        <aside className="rooms-panel">
+        {roomsDrawerOpen && (
+          <button
+            type="button"
+            className="rooms-drawer-backdrop"
+            onClick={() => setRoomsDrawerOpen(false)}
+            aria-label="Dismiss chat rooms"
+          />
+        )}
+
+        <aside
+          id="document-chat-rooms"
+          className={`rooms-panel ${roomsDrawerOpen ? 'mobile-open' : ''}`}
+          aria-label="Chat rooms"
+        >
           <div className="rooms-panel-header">
             <div className="rooms-heading">
               <Link to="/documents" className="icon-button" title="Back to documents" aria-label="Back to documents">
                 <ArrowLeft size={18} />
               </Link>
               <div>
-                <h3>Chat Rooms</h3>
+                <h3>Chat rooms</h3>
                 <span>{rooms.length} total</span>
               </div>
             </div>
-            <button
-              type="button"
-              className="icon-button accent"
-              onClick={() => setCreateModalOpen(true)}
-              title="Create chat room"
-              aria-label="Create chat room"
-            >
-              <Plus size={18} />
-            </button>
+            <div className="rooms-panel-actions">
+              <button
+                type="button"
+                className="icon-button accent"
+                onClick={() => setCreateModalOpen(true)}
+                title="Create chat room"
+                aria-label="Create chat room"
+              >
+                <Plus size={18} />
+              </button>
+              <button
+                type="button"
+                className="icon-button rooms-drawer-close"
+                onClick={() => setRoomsDrawerOpen(false)}
+                title="Close chat rooms"
+                aria-label="Close chat rooms"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
           <div className="document-context">
@@ -545,6 +644,9 @@ const DocumentChat = () => {
               <div className="rooms-empty">
                 <MessageSquare size={24} />
                 <p>No chat rooms yet.</p>
+                <button type="button" className="room-empty-action" onClick={() => setCreateModalOpen(true)}>
+                  Create a room
+                </button>
               </div>
             ) : (
               rooms.map((room) => (
@@ -567,9 +669,23 @@ const DocumentChat = () => {
 
         <section className="conversation-panel">
           <div className="conversation-header">
-            <div>
-              <h3>{selectedRoom?.name || 'No chat room selected'}</h3>
-              <span>{selectedRoom ? 'Message history' : 'Create a room to begin'}</span>
+            <div className="conversation-heading">
+              <button
+                type="button"
+                className="icon-button rooms-drawer-toggle"
+                onClick={() => setRoomsDrawerOpen(true)}
+                aria-controls="document-chat-rooms"
+                aria-expanded={roomsDrawerOpen}
+                aria-label="Open chat rooms"
+                title="Open chat rooms"
+              >
+                <MessageSquare size={18} />
+                <span>Rooms</span>
+              </button>
+              <div className="conversation-title">
+                <h3>{selectedRoom?.name || 'No chat room selected'}</h3>
+                <span>{selectedRoom ? 'Message history' : 'Create a room to begin'}</span>
+              </div>
             </div>
             {isConnected ? (
               <span className="connection-pill online" title={`Connected - ${pendingCount} pending`}>
@@ -589,6 +705,26 @@ const DocumentChat = () => {
               <div className="messages-loading">
                 <Spinner size={28} />
                 <span>Loading messages...</span>
+              </div>
+            ) : initialRoomLoading ? (
+              <div className="conversation-empty">
+                <Spinner size={28} />
+                <h3>Preparing your chat...</h3>
+                <p>We are creating a default room for this document.</p>
+              </div>
+            ) : initialRoomError && documentCanAnswer ? (
+              <div className="conversation-empty room-setup-error">
+                <AlertCircle size={34} />
+                <h3>Chat setup needs attention</h3>
+                <p>We could not prepare a chat room automatically.</p>
+                <div className="room-setup-actions">
+                  <button type="button" className="btn btn-primary" onClick={createDefaultRoom}>
+                    Try again
+                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setCreateModalOpen(true)}>
+                    Create manually
+                  </button>
+                </div>
               </div>
             ) : messages.length === 0 ? (
               <div className="conversation-empty">
@@ -633,22 +769,24 @@ const DocumentChat = () => {
           </div>
 
           <form className="chat-input-form" onSubmit={handleSendMessage}>
-            <input
-              type="text"
-              className="chat-input-field"
-              placeholder={getInputPlaceholder()}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              disabled={!canSend}
-            />
-            <button
-              type="submit"
-              className="chat-send-btn btn btn-primary"
-              disabled={!canSend || !inputText.trim()}
-              title={isSending ? 'Waiting for response' : 'Send message'}
-            >
-              {isSending ? <Spinner size={16} color="#fff" /> : <Send size={16} />}
-            </button>
+            <div className="composer-inner">
+              <input
+                type="text"
+                className="chat-input-field"
+                placeholder={getInputPlaceholder()}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                disabled={!canSend}
+              />
+              <button
+                type="submit"
+                className="chat-send-btn btn btn-primary"
+                disabled={!canSend || !inputText.trim()}
+                title={isSending ? 'Waiting for response' : 'Send message'}
+              >
+                {isSending ? <Spinner size={16} color="var(--on-accent)" /> : <Send size={16} />}
+              </button>
+            </div>
           </form>
         </section>
       </div>
@@ -657,7 +795,7 @@ const DocumentChat = () => {
         <div className="modal-backdrop" role="presentation">
           <form className="create-room-modal" onSubmit={handleCreateRoom}>
             <div className="modal-header">
-              <h3>New Chat Room</h3>
+              <h3>New chat room</h3>
               <button
                 type="button"
                 className="icon-button"
@@ -693,7 +831,7 @@ const DocumentChat = () => {
                 className="btn btn-primary"
                 disabled={creatingRoom || !newRoomName.trim()}
               >
-                {creatingRoom ? <Spinner size={16} color="#fff" /> : <Plus size={16} />}
+                {creatingRoom ? <Spinner size={16} color="var(--on-accent)" /> : <Plus size={16} />}
                 <span>Create</span>
               </button>
             </div>
@@ -703,15 +841,15 @@ const DocumentChat = () => {
 
       <style>{`
         .document-chat-page {
+          box-sizing: border-box;
           display: flex;
           flex-direction: column;
           height: 100%;
           min-height: 0;
-          background-color: var(--bg-card);
-          border: 0;
-          border-radius: 0;
+          gap: 0.75rem;
+          padding: 1.5rem;
+          background-color: var(--bg-primary);
           overflow: hidden;
-          box-shadow: none;
         }
 
         .chat-loading-screen,
@@ -727,9 +865,9 @@ const DocumentChat = () => {
         }
 
         .chat-error-screen {
-          background-color: var(--bg-card);
+          background: var(--bg-card);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-xl);
         }
 
         .error-icon {
@@ -740,21 +878,22 @@ const DocumentChat = () => {
           display: flex;
           align-items: center;
           gap: 1rem;
-          padding: 1rem 1.25rem;
+          min-height: 72px;
+          padding: 0.9rem 1.25rem;
           border-bottom: 1px solid var(--border-color);
-          background-color: var(--bg-secondary);
+          background: var(--bg-sidebar);
         }
 
         .icon-button {
-          width: 34px;
-          height: 34px;
+          width: 44px;
+          height: 44px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-sm);
           color: var(--text-secondary);
-          background-color: var(--bg-card);
+          background-color: var(--bg-elevated);
           cursor: pointer;
           transition: all var(--transition-fast);
           flex-shrink: 0;
@@ -763,14 +902,14 @@ const DocumentChat = () => {
 
         .icon-button:hover {
           color: var(--text-primary);
-          border-color: var(--text-muted);
-          background-color: var(--bg-primary);
+          border-color: var(--accent-color);
+          background-color: var(--accent-light);
         }
 
         .icon-button.accent {
-          color: var(--accent-color);
+          color: var(--on-accent);
           border-color: var(--accent-color);
-          background-color: var(--accent-light);
+          background: var(--accent-color);
         }
 
         .chat-title-info {
@@ -791,7 +930,7 @@ const DocumentChat = () => {
         }
 
         .title-details h2 {
-          font-size: 1.05rem;
+          font-size: 1.12rem;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -811,7 +950,7 @@ const DocumentChat = () => {
           align-items: center;
           gap: 0.35rem;
           padding: 0.175rem 0.5rem;
-          border-radius: 999px;
+          border-radius: var(--border-radius-pill);
           font-size: 0.72rem;
           font-weight: 700;
         }
@@ -838,8 +977,9 @@ const DocumentChat = () => {
           gap: 0.5rem;
           padding: 0.625rem 1.25rem;
           font-size: 0.84rem;
-          font-weight: 600;
-          border-bottom: 1px solid var(--border-color);
+          font-weight: 700;
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-lg);
           text-align: left;
         }
 
@@ -855,7 +995,8 @@ const DocumentChat = () => {
 
         .chat-workspace {
           display: grid;
-          grid-template-columns: 292px minmax(0, 1fr);
+          grid-template-columns: 280px minmax(0, 1fr);
+          gap: 1rem;
           min-height: 0;
           flex: 1;
         }
@@ -864,8 +1005,11 @@ const DocumentChat = () => {
           display: flex;
           flex-direction: column;
           min-height: 0;
-          border-right: 1px solid var(--border-color);
-          background-color: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-xl);
+          background: var(--bg-card);
+          box-shadow: var(--shadow-sm);
+          overflow: hidden;
         }
 
         .rooms-panel-header {
@@ -873,8 +1017,21 @@ const DocumentChat = () => {
           align-items: center;
           justify-content: space-between;
           gap: 0.75rem;
-          padding: 1rem;
+          min-height: 70px;
+          padding: 0.85rem;
           border-bottom: 1px solid var(--border-color);
+        }
+
+        .rooms-panel-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .rooms-drawer-close,
+        .rooms-drawer-toggle,
+        .rooms-drawer-backdrop {
+          display: none;
         }
 
         .rooms-heading {
@@ -886,7 +1043,7 @@ const DocumentChat = () => {
 
         .rooms-panel-header h3,
         .conversation-header h3 {
-          font-size: 0.98rem;
+          font-size: 1rem;
           margin-bottom: 0.1rem;
         }
 
@@ -899,7 +1056,7 @@ const DocumentChat = () => {
         .document-context {
           padding: 0.75rem 1rem;
           border-bottom: 1px solid var(--border-color);
-          background-color: var(--bg-card);
+          background-color: var(--sidebar-user-bg);
         }
 
         .document-context strong {
@@ -926,9 +1083,10 @@ const DocumentChat = () => {
           display: flex;
           align-items: center;
           gap: 0.65rem;
+          min-height: 52px;
           padding: 0.72rem;
           border: 1px solid transparent;
-          border-radius: 8px;
+          border-radius: var(--border-radius-md);
           background-color: transparent;
           color: var(--text-secondary);
           cursor: pointer;
@@ -937,14 +1095,15 @@ const DocumentChat = () => {
         }
 
         .room-item:hover {
-          background-color: var(--bg-primary);
+          color: var(--text-primary);
+          background-color: var(--sidebar-hover-bg);
           border-color: var(--border-color);
         }
 
         .room-item.active {
           color: var(--accent-color);
-          background-color: var(--accent-light);
-          border-color: var(--accent-color);
+          background: var(--accent-light);
+          border-color: var(--border-strong);
         }
 
         .room-copy {
@@ -968,6 +1127,8 @@ const DocumentChat = () => {
           margin-top: 0.15rem;
         }
 
+        .room-item.active .room-copy small { color: var(--text-secondary); }
+
         .rooms-empty,
         .conversation-empty,
         .messages-loading {
@@ -981,12 +1142,36 @@ const DocumentChat = () => {
           padding: 2rem 1rem;
         }
 
+        .room-empty-action {
+          min-height: 36px;
+          padding: 0.4rem 0.75rem;
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-sm);
+          background: var(--bg-elevated);
+          color: var(--text-secondary);
+          font: inherit;
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all var(--transition-fast);
+        }
+
+        .room-empty-action:hover {
+          border-color: var(--accent-color);
+          color: var(--accent-color);
+          background: var(--accent-light);
+        }
+
         .conversation-panel {
           min-width: 0;
           min-height: 0;
           display: flex;
           flex-direction: column;
-          background-color: var(--bg-primary);
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius-xl);
+          background: var(--bg-card);
+          box-shadow: var(--shadow-sm);
+          overflow: hidden;
         }
 
         .conversation-header {
@@ -994,9 +1179,10 @@ const DocumentChat = () => {
           align-items: center;
           justify-content: space-between;
           gap: 1rem;
-          padding: 1rem 1.25rem;
+          min-height: 70px;
+          padding: 0.9rem 1.25rem;
           border-bottom: 1px solid var(--border-color);
-          background-color: var(--bg-card);
+          background: var(--bg-card);
           flex-shrink: 0;
         }
 
@@ -1007,15 +1193,52 @@ const DocumentChat = () => {
           text-overflow: ellipsis;
         }
 
+        .conversation-heading {
+          display: flex;
+          flex: 1;
+          align-items: center;
+          gap: 0.75rem;
+          min-width: 0;
+        }
+
+        .conversation-title {
+          min-width: 0;
+        }
+
         .chat-messages-container {
           flex: 1;
           min-height: 0;
           overflow-y: auto;
-          padding: 1.25rem;
+          padding: clamp(1rem, 3vw, 1.75rem);
+          background: var(--bg-primary);
           overscroll-behavior: contain;
         }
 
+        .room-setup-error {
+          color: var(--text-secondary);
+        }
+
+        .room-setup-error > svg {
+          color: var(--danger-color);
+        }
+
+        .room-setup-error h3 {
+          color: var(--text-primary);
+        }
+
+        .room-setup-actions {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 0.625rem;
+          margin-top: 0.35rem;
+        }
+
         .messages-scroller {
+          width: 100%;
+          max-width: 960px;
+          margin: 0 auto;
           display: flex;
           flex-direction: column;
           gap: 1rem;
@@ -1042,27 +1265,27 @@ const DocumentChat = () => {
         .message-bubble {
           max-width: min(76%, 720px);
           padding: 0.78rem 0.95rem;
-          border-radius: 8px;
+          border-radius: var(--border-radius-lg);
           box-shadow: var(--shadow-sm);
           text-align: left;
         }
 
         .row-assistant .message-bubble {
-          background-color: var(--bg-card);
+          background: var(--bg-card);
           color: var(--text-primary);
           border: 1px solid var(--border-color);
         }
 
         .row-user .message-bubble {
-          background-color: var(--accent-color);
-          color: white;
+          background: var(--accent-color);
+          color: var(--on-accent);
         }
 
         .row-system .message-bubble {
           max-width: min(82%, 640px);
           background-color: var(--danger-light);
           color: var(--danger-color);
-          border: 1px dashed rgba(239, 68, 68, 0.35);
+          border: 1px dashed var(--danger-color);
         }
 
         .message-bubble.streaming {
@@ -1070,10 +1293,23 @@ const DocumentChat = () => {
         }
 
         .message-text {
-          font-size: 0.92rem;
+          font-size: 1rem;
           line-height: 1.55;
           white-space: pre-wrap;
-          word-break: break-word;
+          overflow-wrap: anywhere;
+        }
+
+        .row-user .message-text {
+          color: var(--on-accent);
+          font-weight: 500;
+        }
+
+        .row-assistant .message-text {
+          color: var(--text-primary);
+        }
+
+        .row-system .message-text {
+          color: var(--danger-color);
         }
 
         .message-time {
@@ -1110,24 +1346,31 @@ const DocumentChat = () => {
         }
 
         .chat-input-form {
+          padding: 1rem 1.25rem;
+          border-top: 1px solid var(--border-color);
+          background: var(--bg-card);
+          flex-shrink: 0;
+        }
+
+        .composer-inner {
+          width: 100%;
+          max-width: 960px;
+          margin: 0 auto;
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding: 0.95rem 1.25rem;
-          border-top: 1px solid var(--border-color);
-          background-color: var(--bg-card);
-          flex-shrink: 0;
         }
 
         .chat-input-field {
           flex: 1;
           min-width: 0;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          min-height: 48px;
+          border-radius: var(--border-radius-md);
           padding: 0.75rem 1rem;
           font-family: var(--font-sans);
           font-size: 0.92rem;
-          background-color: var(--bg-primary);
+          background-color: var(--bg-elevated);
           color: var(--text-primary);
           outline: none;
           transition: all var(--transition-fast);
@@ -1135,7 +1378,7 @@ const DocumentChat = () => {
 
         .chat-input-field:focus {
           border-color: var(--accent-color);
-          box-shadow: 0 0 0 3px var(--accent-glow);
+          box-shadow: 0 0 0 3px var(--accent-light);
         }
 
         .chat-input-field:disabled {
@@ -1144,10 +1387,10 @@ const DocumentChat = () => {
         }
 
         .chat-send-btn {
-          width: 42px;
-          height: 42px;
+          width: 48px;
+          height: 48px;
           padding: 0;
-          border-radius: 8px;
+          border-radius: var(--border-radius-pill);
           flex-shrink: 0;
         }
 
@@ -1159,16 +1402,16 @@ const DocumentChat = () => {
           align-items: center;
           justify-content: center;
           padding: 1rem;
-          background-color: rgba(0, 0, 0, 0.48);
+          background-color: rgba(7, 9, 42, 0.68);
         }
 
         .create-room-modal {
           width: min(420px, 100%);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          background-color: var(--bg-card);
+          border-radius: var(--border-radius-xl);
+          background: var(--bg-card);
           box-shadow: var(--shadow-lg);
-          padding: 1.25rem;
+          padding: 1.5rem;
         }
 
         .modal-header {
@@ -1180,7 +1423,7 @@ const DocumentChat = () => {
         }
 
         .modal-header h3 {
-          font-size: 1.08rem;
+          font-size: 1.5rem;
         }
 
         .modal-actions {
@@ -1190,32 +1433,78 @@ const DocumentChat = () => {
           margin-top: 1.25rem;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1023px) {
+          .document-chat-page {
+            padding: 1rem;
+          }
+        }
+
+        @media (max-width: 767px) {
           .document-chat-page {
             height: 100%;
             min-height: 0;
+            gap: 0.75rem;
+            padding: 0.75rem;
           }
 
           .chat-workspace {
             grid-template-columns: 1fr;
-            grid-template-rows: auto minmax(0, 1fr);
+            grid-template-rows: minmax(0, 1fr);
+            gap: 0;
           }
 
           .rooms-panel {
-            max-height: 230px;
-            min-height: 170px;
-            border-right: none;
-            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            inset-block: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-bottom));
+            left: max(0.75rem, env(safe-area-inset-left));
+            z-index: 210;
+            width: min(320px, calc(100vw - 1.5rem));
+            min-height: 0;
+            max-height: none;
+            transform: translateX(-110%);
+            visibility: hidden;
+            pointer-events: none;
+            transition: transform var(--transition-normal), visibility var(--transition-normal);
           }
 
-          .rooms-list {
-            flex-direction: row;
-            overflow-x: auto;
-            overflow-y: hidden;
+          .rooms-panel.mobile-open {
+            transform: translateX(0);
+            visibility: visible;
+            pointer-events: auto;
           }
 
-          .room-item {
-            min-width: 220px;
+          .rooms-drawer-backdrop {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: rgba(10, 12, 16, 0.58);
+            cursor: pointer;
+          }
+
+          .rooms-drawer-close,
+          .rooms-drawer-toggle {
+            display: inline-flex;
+          }
+
+          .rooms-drawer-toggle {
+            width: auto;
+            padding: 0 0.75rem;
+            gap: 0.4rem;
+          }
+
+          .rooms-drawer-toggle span {
+            color: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+          }
+
+          .conversation-panel {
+            grid-column: 1;
+            grid-row: 1;
           }
 
           .chat-messages-container {
@@ -1244,12 +1533,61 @@ const DocumentChat = () => {
             max-width: 88%;
           }
 
+          .conversation-header {
+            gap: 0.5rem;
+          }
+
           .modal-actions {
             flex-direction: column-reverse;
           }
 
           .modal-actions .btn {
             width: 100%;
+          }
+
+          .room-setup-actions {
+            width: 100%;
+            flex-direction: column;
+          }
+
+          .room-setup-actions .btn {
+            width: min(100%, 240px);
+          }
+        }
+
+        @media (max-width: 480px) {
+          .document-chat-page {
+            padding-top: max(0.75rem, env(safe-area-inset-top));
+            padding-right: max(0.75rem, env(safe-area-inset-right));
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+            padding-left: max(0.75rem, env(safe-area-inset-left));
+          }
+
+          .connection-pill,
+          .rooms-drawer-toggle {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            justify-content: center;
+          }
+
+          .connection-pill span,
+          .rooms-drawer-toggle span {
+            display: none;
+          }
+
+          .chat-input-form {
+            padding: 0.75rem;
+          }
+
+          .chat-input-field {
+            min-height: 44px;
+            padding-inline: 0.75rem;
+          }
+
+          .chat-send-btn {
+            width: 44px;
+            height: 44px;
           }
         }
       `}</style>

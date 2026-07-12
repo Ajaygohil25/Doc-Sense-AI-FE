@@ -222,7 +222,7 @@ const ProjectsList = () => {
                 className="btn btn-primary"
                 disabled={creating || !projectName.trim()}
               >
-                {creating ? <Spinner size={16} color="#fff" /> : <Plus size={16} />}
+                {creating ? <Spinner size={16} color="var(--on-accent)" /> : <Plus size={16} />}
                 <span>Create</span>
               </button>
             </div>
@@ -238,6 +238,11 @@ const ProjectsList = () => {
           text-align: left;
         }
 
+        .projects-header h1 {
+          font-size: clamp(2rem, 4vw, 2.75rem);
+          line-height: 1.2;
+        }
+
         .projects-header,
         .projects-actions,
         .project-card-actions,
@@ -248,6 +253,7 @@ const ProjectsList = () => {
         }
 
         .projects-header {
+          align-items: flex-end;
           justify-content: space-between;
           gap: 1rem;
         }
@@ -260,13 +266,19 @@ const ProjectsList = () => {
 
         .projects-loading,
         .projects-empty {
-          min-height: 280px;
+          min-height: 380px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           gap: 1rem;
           text-align: center;
+          background: var(--bg-card);
+          border-radius: var(--border-radius-xl);
+        }
+
+        .projects-empty h3 {
+          font-size: clamp(1.4rem, 3vw, 1.8rem);
         }
 
         .projects-empty p {
@@ -280,33 +292,37 @@ const ProjectsList = () => {
           align-items: center;
           justify-content: center;
           color: var(--accent-color);
-          background-color: var(--accent-light);
+          background: var(--accent-light);
           border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-sm);
         }
 
         .empty-icon {
-          width: 74px;
-          height: 74px;
-          border-radius: 50%;
+          width: 82px;
+          height: 82px;
+          border-radius: var(--border-radius-lg);
         }
 
         .project-card-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 8px;
+          width: 48px;
+          height: 48px;
+          border-radius: var(--border-radius-md);
         }
 
         .projects-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1rem;
+          gap: 1.15rem;
         }
 
         .project-card {
+          position: relative;
           display: flex;
           flex-direction: column;
           gap: 1rem;
-          min-height: 250px;
+          min-height: 280px;
+          padding: 1.6rem;
+          background: var(--bg-card);
         }
 
         .project-card-copy {
@@ -320,6 +336,7 @@ const ProjectsList = () => {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          font-size: 1.35rem;
         }
 
         .project-card-copy p,
@@ -336,7 +353,7 @@ const ProjectsList = () => {
         .modal-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(15, 23, 42, 0.45);
+          background: rgba(7, 9, 42, 0.68);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -346,10 +363,10 @@ const ProjectsList = () => {
 
         .project-modal {
           width: min(480px, 100%);
-          background-color: var(--bg-card);
+          background: var(--bg-card);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 1.25rem;
+          border-radius: var(--border-radius-xl);
+          padding: 1.5rem;
           box-shadow: var(--shadow-lg);
           display: flex;
           flex-direction: column;
@@ -360,16 +377,20 @@ const ProjectsList = () => {
           justify-content: space-between;
         }
 
+        .modal-header h3 {
+          font-size: 1.6rem;
+        }
+
         .icon-button {
-          width: 34px;
-          height: 34px;
+          width: 44px;
+          height: 44px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-sm);
           color: var(--text-secondary);
-          background-color: var(--bg-card);
+          background-color: var(--bg-elevated);
           cursor: pointer;
         }
 
@@ -398,6 +419,8 @@ const ProjectsList = () => {
           .project-card-actions .btn {
             flex: 1;
           }
+
+          .projects-empty { min-height: 330px; }
         }
       `}</style>
     </div>
